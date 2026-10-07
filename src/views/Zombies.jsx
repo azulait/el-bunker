@@ -18,11 +18,8 @@ export function Zombies() {
       </p>
 
       <Row className="justify-content-center">
-        {/* Usamos map para recorrer el arreglo de ZombiesBunker */}
         {ZombiesBunker.map((zombie) => (
-          // Asignamos una columna ancha (10 de 12 espacios en pantallas grandes)
           <Col key={zombie.id} xs={12} lg={10}>
-             {/* Le pasamos la información de cada zombie al componente */}
             <ZombiesCard zombie={zombie} />
           </Col>
         ))}

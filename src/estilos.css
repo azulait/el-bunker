@@ -22,8 +22,12 @@ p, button, .modal-body {
 
 .TituloBunker{
     font-size: 10rem;
-    letter-spacing: 3px;
-    
+    letter-spacing: 3px; 
+}
+
+.TituloZombie{
+    font-size: 6rem;
+    letter-spacing: 3px; 
 }
 
 .texto-blanco {
@@ -101,6 +105,12 @@ p, button, .modal-body {
 .card-estilos {
     background-color: #1a1a1a;
     border: 2px solid #a83232;
+    border-radius: 8px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-estilosZ {
+    background-color: #1a1a1a;
+    border: 2px solid #114b18;
     border-radius: 8px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
