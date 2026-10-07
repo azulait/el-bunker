@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 export function NavbarBunker() {
   return (
-    <Navbar bg="dark" variant="dark" expand="lg" className="border-bottom border-danger">
+    <Navbar className="navbar-bunker">
       <Container fluid>
         <Navbar.Brand href="/">
              <span className="fs-2 text-white fuente-bunker">El Bunker</span>
@@ -16,12 +16,11 @@ export function NavbarBunker() {
         <Navbar.Collapse id="menu-bunker">
             <Nav className="me-auto">
         {/* Usa as={Link} y to="/" en lugar de href */}
-                <Nav.Link as={Link} to="/inicio">Inicio</Nav.Link>
-                <Nav.Link as={Link} to="/login">Inicio de sesión</Nav.Link>
-                <Nav.Link as={Link} to="/armas">Armas y Defensa</Nav.Link>
-                <Nav.Link as={Link} to="/kits">Kits Médicos</Nav.Link>
-                <Nav.Link as={Link} to="/zombies">Guia de Zombies</Nav.Link>
-                <Nav.Link as={Link} to="/carrito">Carrito</Nav.Link>
+                <Nav.Link as={Link} to="/inicio" className="nav-link-bunker">Inicio</Nav.Link>
+                <Nav.Link as={Link} to="/login" className="nav-link-bunker">Inicio de sesión</Nav.Link>
+                <Nav.Link as={Link} to="/categorias" className="nav-link-bunker">Categorías</Nav.Link>
+                <Nav.Link as={Link} to="/zombies" className="nav-link-bunker">Guia de Zombies</Nav.Link>
+                <Nav.Link as={Link} to="/carrito" className="nav-link-bunker">Carrito</Nav.Link>
             </Nav>
         </Navbar.Collapse>
       </Container>
