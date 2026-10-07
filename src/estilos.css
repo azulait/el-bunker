@@ -8,10 +8,10 @@
   letter-spacing: 2px; 
 }
 
-body{
-    font-family: 'ShlopZombie', cursive , sans-serif;
-  background-color: #121212; /* Un gris muy oscuro, casi negro */
 
+body {
+  font-family: 'Shlop', cursive, sans-serif; /* Corregido para que coincida */
+  background-color: #121212; 
 }
 
 
@@ -32,6 +32,10 @@ p, button, .modal-body {
 
 .texto-rojo {
     color: #dc3545 !important; 
+}
+
+.texto-verde {
+    color: #155f13 !important; 
 }
 
 .texto-amarillo {

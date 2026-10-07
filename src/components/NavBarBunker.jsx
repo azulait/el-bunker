@@ -20,7 +20,7 @@ export function NavbarBunker() {
                 <Nav.Link as={Link} to="/login">Inicio de sesión</Nav.Link>
                 <Nav.Link as={Link} to="/armas">Armas y Defensa</Nav.Link>
                 <Nav.Link as={Link} to="/kits">Kits Médicos</Nav.Link>
-                <Nav.Link as={Link} to="/raciones">Raciones y Agua</Nav.Link>
+                <Nav.Link as={Link} to="/zombies">Guia de Zombies</Nav.Link>
                 <Nav.Link as={Link} to="/carrito">Carrito</Nav.Link>
             </Nav>
         </Navbar.Collapse>
