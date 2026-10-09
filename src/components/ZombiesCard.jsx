@@ -17,13 +17,12 @@ export function ZombiesCard({ zombie }) {
       style={{ cursor: 'pointer', overflow: 'hidden' }} 
       onClick={handleClick}
     >
-      <Row className="g-0">
+      <Row className="g-0 h-100">
         <Col md={4}>
           <Card.Img 
             src={zombie.imagen} 
             alt={zombie.nombre} 
-            className="img-estilos h-100"
-            style={{ objectFit: 'cover' }} 
+            className="img-estilos"
           />
         </Col>
         <Col md={8}>
@@ -33,14 +32,11 @@ export function ZombiesCard({ zombie }) {
             </Card.Title>
             <Card.Text className="fs-3">
               <span className="texto-amarillo">NIVEL DE PELIGRO: </span>
-              <span className="texto-rojo">BAJO</span>
+              <span className="texto-rojo">{zombie.categoria}</span>
             </Card.Text>
             <Card.Text>
               {zombie.descripcion}
             </Card.Text>
-            <small className="mt-auto texto-verde fw-bold">
-              Haz clic para leer la bitácora completa...
-            </small>
           </Card.Body>
         </Col>
       </Row>

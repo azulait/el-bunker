@@ -1,0 +1,15 @@
+body {
+  /* 1. Oscurecemos la imagen usando un linear-gradient antes del url */
+  background-image: 
+    linear-gradient(rgba(18, 18, 18, 0), rgba(27, 15, 15, 0.85)), 
+    url('/img/L4F2Fondo.jpg'); /* Cambia la ruta según la ubicación de tu imagen */
+
+  /* 2. Propiedades para que la imagen cubra toda la pantalla */
+  background-size: cover;         /* Escala la imagen para cubrir toda la pantalla */
+  background-position: center;     /* Centra la imagen de fondo */
+  background-repeat: no-repeat;   /* Evita que la imagen se repita como mosaico */
+  background-attachment: fixed;   /* Queda fija al hacer scroll (Efecto Parallax) */
+
+  font-family: 'Shlop', cursive, sans-serif;
+  color: #ffffff;
+}

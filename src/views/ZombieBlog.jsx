@@ -30,17 +30,18 @@ export function ZombieBlog() {
       </button>
 
       {/* Título Principal */}
-      <h1 className="TituloBunker texto-rojo text-center mb-4 border-bottom border-danger pb-3">
+      <h1 className="TituloBunker texto-verde text-center mb-4 border-bottom border-danger pb-3">
         {zombie.nombre}
       </h1>
 
       {/* Imagen / GIF grande y centrada */}
-      <div className="text-center mb-5">
+
+      <div className="mb-5">
         <img 
           src={zombie.gif || zombie.imagen} 
           alt={`Animación de ${zombie.nombre}`} 
           className="img-fluid rounded img-estilos"
-          style={{ maxHeight: '500px', width: '100%', objectFit: 'cover' }}
+          style={{ maxHeight: '500px', width: '50%', objectFit: 'cover' }}
         />
       </div>
 

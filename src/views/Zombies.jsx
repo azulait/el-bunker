@@ -11,10 +11,13 @@ export function Zombies() {
   return (
     <Container className="py-5">
       <h2 className="TituloBunker texto-verde text-center mb-3">
-        Archivo de Mutaciones
+        LOS INFECTADOS
       </h2>
-      <p className="text-center text-light mb-5 fs-5">
-        Conoce a tus enemigos. Haz clic en cada expediente para leer la bitácora completa.
+      <p className="text-center text-light mb-50 fs-50">
+        "Si conoces al enemigo y te conoces a ti mismo, no debes temer el resultado de cien batallas"
+      </p>
+      <p className="text-center texto-amarillo mb-50 fs-50">
+        - El chino del arte de la guerra.
       </p>
 
       <Row className="justify-content-center">
