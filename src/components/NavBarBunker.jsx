@@ -17,7 +17,7 @@ export function NavbarBunker() {
             <Nav className="me-auto">
         {/* Usa as={Link} y to="/" en lugar de href */}
                 <Nav.Link as={Link} to="/inicio" className="nav-link-bunker">Inicio</Nav.Link>
-                <Nav.Link as={Link} to="/login" className="nav-link-bunker">Inicio de sesión</Nav.Link>
+                <Nav.Link as={Link} to="/iniciar-sesion" className="nav-link-bunker">Inicio de sesión</Nav.Link>
                 <Nav.Link as={Link} to="/categorias" className="nav-link-bunker">Categorías</Nav.Link>
                 <Nav.Link as={Link} to="/zombies" className="nav-link-bunker">Guia de Zombies</Nav.Link>
                 <Nav.Link as={Link} to="/carrito" className="nav-link-bunker">Carrito</Nav.Link>

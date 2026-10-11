@@ -8,6 +8,9 @@ import  Carrito from './views/Carrito';
 import Checkout from './views/Checkout';
 import { PagoExito } from './views/PagoExito';
 import { PagoError } from './views/PagoError';
+import { Registro } from './views/Registro';
+import IniciarSesion from './views/IniciarSesion';
+
 
 function App() {
   return (
@@ -23,6 +26,8 @@ function App() {
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/pago-exito" element={<PagoExito />} />
         <Route path="/pago-error" element={<PagoError />} />
+        <Route path="/registro" element={<Registro />} />
+        <Route path="/iniciar-sesion" element={<IniciarSesion />} />
         <Route path="*" element={<h2 className="text-center mt-5 text-danger">Página no encontrada</h2>} />
       </Routes>
 
