@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Table, Button, Alert } from 'react-bootstrap';
 import { productosBunker } from '../data/productos';
+import { useNavigate } from 'react-router-dom';
 
 export default function Carrito() {
+  const navigate = useNavigate();
   const [carrito, setCarrito] = useState(() => {
     const carritoGuardado = localStorage.getItem('carrito_bunker');
     if (carritoGuardado) {
@@ -176,8 +178,11 @@ export default function Carrito() {
                 <Button variant="secondary" size="sm" onClick={limpiarCarrito}>
                   Limpiar
                 </Button>
-                <Button variant="success" size="sm">
-                  Comprar ahora
+                <Button
+                variant="success" 
+                size="sm"
+                onClick={() => navigate('/checkout')}>
+                Comprar ahora          
                 </Button>
               </div>
             </div>
