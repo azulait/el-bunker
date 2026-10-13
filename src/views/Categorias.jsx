@@ -1,4 +1,5 @@
-import { useState } from 'react';
+// 1. Unificamos las importaciones de React en una sola línea
+import React, { useState, useEffect } from 'react';
 import { productosBunker } from '../data/productos';
 import { ProductoCard } from '../components/ProductoCard';
 import Container from 'react-bootstrap/Container';
@@ -8,14 +9,23 @@ import Nav from 'react-bootstrap/Nav';
 
 export function Categorias() {
   const [categoriaActiva, setCategoriaActiva] = useState('Todas');
+  const [listaProductos, setListaProductos] = useState([]);
 
   // Categorías disponibles
-  const categorias = ['Todas', 'Armas', 'Kits'];
+  const categorias = ['Todas', 'Armas', 'Kits']; // Ajustado para que coincida con las categorías del Admin
 
-  // Filtrar productos según la categoría seleccionada
+  useEffect(() => {
+    const guardados = JSON.parse(localStorage.getItem('productos_bunker'));
+    if (guardados && guardados.length > 0) {
+      setListaProductos(guardados);
+    } else {
+      setListaProductos(productosBunker); 
+    }
+  }, []);
+
   const productosFiltrados = categoriaActiva === 'Todas'
-    ? productosBunker
-    : productosBunker.filter(prod => prod.categoria === categoriaActiva);
+    ? listaProductos
+    : listaProductos.filter(prod => prod.categoria === categoriaActiva);
 
   return (
     <Container className="mt-5 text-white fuente-bunker">
@@ -24,7 +34,6 @@ export function Categorias() {
         Selecciona una categoría para filtrar el equipamiento de supervivencia disponible.
       </p>
 
-      {/* Selector de Categorías (Nav Pills) */}
       <Nav 
         variant="pills" 
         activeKey={categoriaActiva} 
@@ -39,7 +48,7 @@ export function Categorias() {
                 categoriaActiva === cat ? 'bg-danger text-white' : 'bg-dark text-danger'
               }`}
             >
-              {cat === 'Armas' ? 'Armas y Defensa' : cat === 'Kits' ? 'Kits Médicos' : 'Todas'}
+              {cat === 'Armas' ? 'Armas y Defensa' : cat === 'Kits' ? 'Kits' : 'Todas'}
             </Nav.Link>
           </Nav.Item>
         ))}

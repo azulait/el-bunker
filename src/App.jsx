@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { NavbarBunker } from './components/NavBarBunker';
 import { Home } from './views/Inicio';
@@ -10,12 +11,23 @@ import { PagoExito } from './views/PagoExito';
 import { PagoError } from './views/PagoError';
 import { Registro } from './views/Registro';
 import IniciarSesion from './views/IniciarSesion';
+import { Admin } from './views/Admin';
 
 
-function App() {
+ function App() {
+  const [usuario, setUsuario] = useState(() => {
+    const sesionGuardada = localStorage.getItem('usuario_activo');
+    return sesionGuardada ? JSON.parse(sesionGuardada) : null;
+  });
+
+  const cerrarSesion = () => {
+    localStorage.removeItem('usuario_activo');
+    setUsuario(null);
+  };
+
   return (
     <BrowserRouter>
-      <NavbarBunker />
+      <NavbarBunker usuario={usuario} cerrarSesion={cerrarSesion}/>
 
       <Routes>
         <Route path="/inicio" element={<Home />} />
@@ -27,7 +39,8 @@ function App() {
         <Route path="/pago-exito" element={<PagoExito />} />
         <Route path="/pago-error" element={<PagoError />} />
         <Route path="/registro" element={<Registro />} />
-        <Route path="/iniciar-sesion" element={<IniciarSesion />} />
+        <Route path="/iniciar-sesion" element={<IniciarSesion setUsuario={setUsuario} />} />
+        <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<h2 className="text-center mt-5 text-danger">Página no encontrada</h2>} />
       </Routes>
 

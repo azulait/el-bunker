@@ -1,13 +1,27 @@
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-
-// Importamos el componente de la tarjeta
-import { ZombiesCard } from '../components/ZombiesCard';
-// Importamos la base de datos de los zombies
 import { ZombiesBunker } from '../data/zombies';
+import { ZombiesCard } from '../components/ZombiesCard';
+import React, { useState, useEffect } from 'react';
 
 export function Zombies() {
+  
+  const [listaZombies, setListaZombies] = useState([]);
+
+  useEffect(() => {
+    // 1. Intenta leer del localStorage
+    const zombiesGuardados = JSON.parse(localStorage.getItem('zombies_bunker'));
+    
+    if (zombiesGuardados && zombiesGuardados.length > 0) {
+      // 2. Si hay datos guardados (modificados por el admin), úsalos
+      setListaZombies(zombiesGuardados);
+    } else {
+      // 3. Si no hay nada en localStorage, usa el archivo original por defecto
+      setListaZombies(ZombiesBunker);
+    }
+  }, []);
+  
   return (
     <Container className="py-5">
       <h2 className="TituloBunker texto-verde text-center mb-3">
@@ -21,7 +35,7 @@ export function Zombies() {
       </p>
 
       <Row className="justify-content-center">
-        {ZombiesBunker.map((zombie) => (
+        {listaZombies.map((zombie) => (
           <Col key={zombie.id} xs={12} lg={10}>
             <ZombiesCard zombie={zombie} />
           </Col>

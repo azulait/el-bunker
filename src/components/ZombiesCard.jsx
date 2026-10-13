@@ -3,11 +3,11 @@ import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
+
 export function ZombiesCard({ zombie }) {
-  const navigate = useNavigate(); // Hook para cambiar de página
+  const navigate = useNavigate(); 
 
   const handleClick = () => {
-    // Redirige a la ruta del zombie usando su ID
     navigate(`/zombie/${zombie.id}`);
   };
 

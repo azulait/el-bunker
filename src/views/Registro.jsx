@@ -7,7 +7,7 @@ export function Registro() {
   const [formData, setFormData] = useState({
     nombre: '',
     apellidos: '',
-    correo: '',
+    email: '', 
     password: '',
   });
   const [mensaje, setMensaje] = useState('');
@@ -19,18 +19,23 @@ export function Registro() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const usuariosRegistrados = JSON.parse(localStorage.getItem('usuarios_bunker')) || [];
+    const usuariosRegistrados = JSON.parse(localStorage.getItem('usuarios')) || [];
     
-    // Validar si el correo ya existe
-    const existe = usuariosRegistrados.find(u => u.correo === formData.correo);
+    const existe = usuariosRegistrados.find(u => u.email === formData.email);
     if (existe) {
       setTipoAlerta('danger');
       setMensaje('Este correo ya se encuentra registrado.');
       return;
     }
 
-    usuariosRegistrados.push(formData);
-    localStorage.setItem('usuarios_bunker', JSON.stringify(usuariosRegistrados));
+    const nuevoUsuario = { 
+      ...formData, 
+      id: Date.now().toString(), 
+      esAdmin: false 
+    };
+
+    usuariosRegistrados.push(nuevoUsuario);
+    localStorage.setItem('usuarios', JSON.stringify(usuariosRegistrados));
     
     setTipoAlerta('success');
     setMensaje('¡Registro exitoso! Redirigiendo al inicio de sesión...');
@@ -73,11 +78,12 @@ export function Registro() {
 
           <Form.Group className="mb-3">
             <Form.Label>Correo Electrónico</Form.Label>
+            {/* Cambiado el name a 'email' */}
             <Form.Control
               type="email"
-              name="correo"
+              name="email"
               placeholder="ejemplo@correo.com"
-              value={formData.correo}
+              value={formData.email}
               onChange={handleChange}
               required
             />

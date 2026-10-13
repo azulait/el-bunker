@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Container, Card, Form, Button, Alert } from 'react-bootstrap';
 import { useNavigate, Link } from 'react-router-dom';
 
-export default function IniciarSesion() {
+export default function IniciarSesion({ setUsuario }) {
   const navigate = useNavigate();
   const [credenciales, setCredenciales] = useState({ correo: '', password: '' });
   const [error, setError] = useState('');
@@ -13,15 +13,35 @@ export default function IniciarSesion() {
 
   const handleIniciarSesion = (e) => {
     e.preventDefault();
-    const usuariosRegistrados = JSON.parse(localStorage.getItem('usuarios_bunker')) || [];
+
+    if (credenciales.correo === 'admin@elbunker.cl' && credenciales.password === 'admin123') {
+      const adminData = {
+        nombre: 'Comandante Admin',
+        correo: credenciales.correo,
+        esAdmin: true
+      };
+      
+      localStorage.setItem('usuario_activo', JSON.stringify(adminData));
+      if (setUsuario) setUsuario(adminData);
+      navigate('/admin'); // Lo enviamos al admin
+      return;
+    }
+
+    const usuariosRegistrados = JSON.parse(localStorage.getItem('usuarios')) || [];
     
     const usuarioEncontrado = usuariosRegistrados.find(
-      u => u.correo === credenciales.correo && u.password === credenciales.password
+      u => u.email === credenciales.correo && u.password === credenciales.password
     );
 
     if (usuarioEncontrado) {
       localStorage.setItem('usuario_activo', JSON.stringify(usuarioEncontrado));
-      navigate('/categorias');
+      if (setUsuario) setUsuario(usuarioEncontrado); 
+      
+      if (usuarioEncontrado.esAdmin) {
+        navigate('/admin');
+      } else {
+        navigate('/categorias');
+      }
     } else {
       setError('Correo o contraseña incorrectos, o usuario no registrado.');
     }
@@ -65,7 +85,7 @@ export default function IniciarSesion() {
 
         <div className="text-center mt-2">
           <p className="text-muted mb-0" style={{ fontSize: '0.9rem' }}>
-            No tienes una cuenta?{' '}
+            ¿No tienes una cuenta?{' '}
             <Link to="/registro" className="text-info text-decoration-none fw-bold">
               Regístrate aquí
             </Link>
