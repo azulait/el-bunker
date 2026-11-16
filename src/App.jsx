@@ -30,6 +30,7 @@ import { Admin } from './views/Admin';
       <NavbarBunker usuario={usuario} cerrarSesion={cerrarSesion}/>
 
       <Routes>
+        <Route path="/" element={<Home />} />
         <Route path="/inicio" element={<Home />} />
         <Route path="/zombies" element={<Zombies />} />
         <Route path="/categorias" element={<Categorias />} />
@@ -38,7 +39,7 @@ import { Admin } from './views/Admin';
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/pago-exito" element={<PagoExito />} />
         <Route path="/pago-error" element={<PagoError />} />
-        <Route path="/registro" element={<Registro />} />
+        <Route path="/registro" element={<Registro setUsuario={setUsuario} />} />
         <Route path="/iniciar-sesion" element={<IniciarSesion setUsuario={setUsuario} />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<h2 className="text-center mt-5 text-danger">Página no encontrada</h2>} />

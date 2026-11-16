@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Container, Card, Form, Button, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { useGoogleLogin } from '@react-oauth/google';
 
-export function Registro() {
+export function Registro({ setUsuario }) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     nombre: '',
@@ -45,6 +46,40 @@ export function Registro() {
     }, 1500);
   };
 
+const registroConGoogle = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+        });
+        const userInfo = await res.json();
+
+        const usuariosGuardados = JSON.parse(localStorage.getItem('usuarios')) || [];
+        let usuarioExistente = usuariosGuardados.find(u => u.email === userInfo.email);
+
+        if (!usuarioExistente) {
+          usuarioExistente = {
+            id: Date.now(),
+            nombre: userInfo.given_name || userInfo.name,
+            apellidos: userInfo.family_name || '',
+            email: userInfo.email,
+            rol: 'cliente',
+            avatar: userInfo.picture
+          };
+          usuariosGuardados.push(usuarioExistente);
+          localStorage.setItem('usuarios', JSON.stringify(usuariosGuardados));
+        }
+
+        localStorage.setItem('usuario_activo', JSON.stringify(usuarioExistente));
+        if (setUsuario) setUsuario(usuarioExistente);
+        navigate('/inicio');
+
+      } catch (err) {
+        console.error("Error al registrarse con Google:", err);
+      }
+    },
+    onError: () => console.log('Registro con Google cancelado'),
+  });
   return (
     <Container className="my-5" style={{ maxWidth: '500px' }}>
       <Card className="shadow-lg p-4 bg-dark text-white border-secondary">
@@ -105,6 +140,17 @@ export function Registro() {
             Registrarse
           </Button>
         </Form>
+        <div className="my-3 text-center">
+        <span className="text-secondary small">O REGÍSTRATE DIRECTAMENTE</span>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => registroConGoogle()}
+        className="btn btn-outline-light w-100 d-flex align-items-center justify-content-center gap-2"
+      >
+        Registrarse con Google
+      </button>
       </Card>
     </Container>
   );
