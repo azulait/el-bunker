@@ -6,7 +6,6 @@ export function CrudUsuarios() {
   const [showModal, setShowModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   
-  // Estado para el formulario
   const [formData, setFormData] = useState({
     id: '',
     nombre: '',
@@ -15,15 +14,20 @@ export function CrudUsuarios() {
     esAdmin: false
   });
 
-  useEffect(() => {
-    const usuariosGuardados = JSON.parse(localStorage.getItem('usuarios')) || [];
-    setUsuarios(usuariosGuardados);
-  }, []);
-
-  const guardarDatos = (nuevosUsuarios) => {
-    localStorage.setItem('usuarios', JSON.stringify(nuevosUsuarios));
-    setUsuarios(nuevosUsuarios);
+  // 1. Obtener usuarios desde la base de datos (GET)
+  const fetchUsuarios = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/usuario');
+      const data = await response.json();
+      setUsuarios(data);
+    } catch (error) {
+      console.error("Error obteniendo usuarios:", error);
+    }
   };
+
+  useEffect(() => {
+    fetchUsuarios();
+  }, []);
 
   const handleClose = () => {
     setShowModal(false);
@@ -41,16 +45,32 @@ export function CrudUsuarios() {
     });
   };
 
-  const handleSubmit = (e) => {
+  // 2. Guardar (POST) o Actualizar (PUT) en la base de datos
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editMode) {
-      const usuariosActualizados = usuarios.map(u => u.id === formData.id ? formData : u);
-      guardarDatos(usuariosActualizados);
-    } else {
-      const nuevoUsuario = { ...formData, id: Date.now().toString() };
-      guardarDatos([...usuarios, nuevoUsuario]);
+    try {
+      if (editMode) {
+        // Actualizar existente
+        await fetch(`http://localhost:8080/api/usuario/${formData.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+      } else {
+        // Crear nuevo (SQL le asignará el ID automáticamente)
+        const { id, ...usuarioSinId } = formData;
+        await fetch('http://localhost:8080/api/usuario', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(usuarioSinId)
+        });
+      }
+      // Refrescar la tabla consultando de nuevo a la BD
+      fetchUsuarios();
+      handleClose();
+    } catch (error) {
+      console.error("Error al guardar el usuario:", error);
     }
-    handleClose();
   };
 
   const handleEdit = (usuario) => {
@@ -59,10 +79,18 @@ export function CrudUsuarios() {
     setShowModal(true);
   };
 
-  const handleDelete = (id) => {
+  // 3. Eliminar de la base de datos (DELETE)
+  const handleDelete = async (id) => {
     if (window.confirm('¿Estás seguro de expulsar a este sobreviviente del Búnker?')) {
-      const usuariosFiltrados = usuarios.filter(u => u.id !== id);
-      guardarDatos(usuariosFiltrados);
+      try {
+        await fetch(`http://localhost:8080/api/usuario/${id}`, {
+          method: 'DELETE'
+        });
+        // Refrescar la tabla
+        fetchUsuarios();
+      } catch (error) {
+        console.error("Error al eliminar el usuario:", error);
+      }
     }
   };
 
@@ -100,10 +128,10 @@ export function CrudUsuarios() {
                   </span>
                 </td>
                 <td>
-                  <Button variant="outline-info" size="sm" className="me-2" onClick={() => handleEdit(usuario)}>
+                  <Button variant="outline-info" size="sm" className="me-2 mb-1" onClick={() => handleEdit(usuario)}>
                     Editar
                   </Button>
-                  <Button variant="outline-danger" size="sm" onClick={() => handleDelete(usuario.id)}>
+                  <Button variant="outline-danger" size="sm" className="mb-1" onClick={() => handleDelete(usuario.id)}>
                     Eliminar
                   </Button>
                 </td>

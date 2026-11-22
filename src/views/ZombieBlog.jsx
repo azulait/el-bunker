@@ -1,17 +1,42 @@
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Row, Col } from 'react-bootstrap'; // Importamos Row y Col
-import { ZombiesBunker } from '../data/zombies';
+import { Container, Row, Col } from 'react-bootstrap'; 
 
 export function ZombieBlog() {
   const { id } = useParams();
   const navigate = useNavigate();
+  
+  // Estados para guardar el zombie encontrado y manejar el tiempo de carga
+  const [zombie, setZombie] = useState(null);
+  const [cargando, setCargando] = useState(true);
 
-  // 1. Leemos del localStorage para que los cambios del Admin se vean aquí
-  const guardados = JSON.parse(localStorage.getItem('zombies_bunker'));
-  const zombiesActuales = guardados && guardados.length > 0 ? guardados : ZombiesBunker;
+  useEffect(() => {
+    const fetchZombie = async () => {
+      try {
+        const respuesta = await fetch('http://localhost:8080/api/zombie');
+        const datos = await respuesta.json();
+        
+        // Buscamos el zombie comparando los IDs
+        const zombieEncontrado = datos.find((z) => z.id.toString() === id.toString());
+        setZombie(zombieEncontrado);
+      } catch (error) {
+        console.error("Error obteniendo el expediente del zombie:", error);
+      } finally {
+        setCargando(false);
+      }
+    };
 
-  // 2. Buscamos el zombie comparando los IDs como texto (más seguro)
-  const zombie = zombiesActuales.find((z) => z.id.toString() === id.toString());
+    fetchZombie();
+  }, [id]);
+
+  // Pantalla de carga mientras espera la respuesta de la base de datos
+  if (cargando) {
+    return (
+      <Container className="py-5 text-center texto-blanco">
+        <h2 className="texto-verde fuente-bunker TituloBunker">Desencriptando expediente...</h2>
+      </Container>
+    );
+  }
 
   if (!zombie) {
     return (
@@ -53,7 +78,6 @@ export function ZombieBlog() {
             {zombie.descripcion}
           </p>
           
-          {/* Si quieres mostrar el texto del blog también, lo dejamos aquí abajo de la descripción */}
           {zombie.blog && (
             <p className="fs-5 text-secondary mt-3">
               <em>{zombie.blog}</em>

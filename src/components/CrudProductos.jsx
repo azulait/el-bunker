@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form } from 'react-bootstrap';
-// 1. Importamos tus datos estáticos de productos
-import { productosBunker } from '../data/productos';
 
 export function CrudProductos() {
   const [productos, setProductos] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   
-  // 2. Adaptamos el estado a tu estructura de datos de productos
   const [formData, setFormData] = useState({
     id: '',
     nombre: '',
@@ -18,23 +15,20 @@ export function CrudProductos() {
     descripcion: ''
   });
 
-  // 3. Cargar datos iniciales (De LocalStorage o de tu archivo JS)
-  useEffect(() => {
-    const productosGuardados = JSON.parse(localStorage.getItem('productos_bunker'));
-    
-    if (productosGuardados && productosGuardados.length > 0) {
-      setProductos(productosGuardados);
-    } else {
-      // Si no hay datos en localStorage, carga los de productos.js por defecto
-      setProductos(productosBunker);
-      localStorage.setItem('productos_bunker', JSON.stringify(productosBunker));
+  // 1. Obtener datos desde la base de datos (GET)
+  const fetchProductos = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/producto');
+      const data = await response.json();
+      setProductos(data);
+    } catch (error) {
+      console.error("Error obteniendo productos:", error);
     }
-  }, []);
-
-  const guardarDatos = (nuevosProductos) => {
-    localStorage.setItem('productos_bunker', JSON.stringify(nuevosProductos));
-    setProductos(nuevosProductos);
   };
+
+  useEffect(() => {
+    fetchProductos();
+  }, []);
 
   const handleClose = () => {
     setShowModal(false);
@@ -48,21 +42,34 @@ export function CrudProductos() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  // 2. Guardar (POST) o Actualizar (PUT) en la base de datos
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Asegurarnos de que el precio se guarde como número
     const productoProcesado = { ...formData, precio: Number(formData.precio) };
 
-    if (editMode) {
-      const productosActualizados = productos.map(p => p.id === formData.id ? productoProcesado : p);
-      guardarDatos(productosActualizados);
-    } else {
-      // Crear nuevo asignando un ID numérico basado en la hora
-      const nuevoProducto = { ...productoProcesado, id: Date.now() };
-      guardarDatos([...productos, nuevoProducto]);
+    try {
+      if (editMode) {
+        // Actualizar existente
+        await fetch(`http://localhost:8080/api/producto/${formData.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(productoProcesado)
+        });
+      } else {
+        // Crear nuevo (SQL se encarga de asignar el ID)
+        const { id, ...productoSinId } = productoProcesado;
+        await fetch('http://localhost:8080/api/producto', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(productoSinId)
+        });
+      }
+      // Refrescar la tabla con los datos reales de la base de datos
+      fetchProductos();
+      handleClose();
+    } catch (error) {
+      console.error("Error al guardar el producto:", error);
     }
-    handleClose();
   };
 
   const handleEdit = (producto) => {
@@ -71,10 +78,18 @@ export function CrudProductos() {
     setShowModal(true);
   };
 
-  const handleDelete = (id) => {
+  // 3. Eliminar de la base de datos (DELETE)
+  const handleDelete = async (id) => {
     if (window.confirm('¿Estás seguro de eliminar este suministro del inventario?')) {
-      const productosFiltrados = productos.filter(p => p.id !== id);
-      guardarDatos(productosFiltrados);
+      try {
+        await fetch(`http://localhost:8080/api/producto/${id}`, {
+          method: 'DELETE'
+        });
+        // Refrescar la tabla
+        fetchProductos();
+      } catch (error) {
+        console.error("Error al eliminar el producto:", error);
+      }
     }
   };
 
@@ -110,7 +125,7 @@ export function CrudProductos() {
                   {producto.categoria}
                 </span>
               </td>
-              <td className="texto-amarillo fw-bold">\${producto.precio}</td>
+              <td className="texto-amarillo fw-bold">${producto.precio}</td>
               <td>{producto.descripcion.substring(0, 50)}...</td>
               <td>
                 <Button variant="outline-info" size="sm" className="me-2 mb-1" onClick={() => handleEdit(producto)}>
@@ -144,8 +159,7 @@ export function CrudProductos() {
                   <Form.Select name="categoria" value={formData.categoria} onChange={handleChange} required>
                     <option value="">Selecciona...</option>
                     <option value="Armas">Armas</option>
-                    <option value="Kits Médicos">Kits Médicos</option>
-                    <option value="Otros">Otros</option>
+                    <option value="Kits">Kits</option>
                   </Form.Select>
                 </Form.Group>
               </div>
@@ -160,7 +174,7 @@ export function CrudProductos() {
               </div>
               <div className="col-md-6">
                 <Form.Group className="mb-3">
-                  <Form.Label>Precio (\$)</Form.Label>
+                  <Form.Label>Precio ($)</Form.Label>
                   <Form.Control type="number" name="precio" placeholder="Ej: 15000" value={formData.precio} onChange={handleChange} required />
                 </Form.Group>
               </div>

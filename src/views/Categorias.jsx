@@ -1,6 +1,4 @@
-// 1. Unificamos las importaciones de React en una sola línea
 import React, { useState, useEffect } from 'react';
-import { productosBunker } from '../data/productos';
 import { ProductoCard } from '../components/ProductoCard';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -14,13 +12,19 @@ export function Categorias() {
   // Categorías disponibles
   const categorias = ['Todas', 'Armas', 'Kits']; // Ajustado para que coincida con las categorías del Admin
 
+  // Reemplazamos la lectura de localStorage/productos.js por la petición fetch a tu API
   useEffect(() => {
-    const guardados = JSON.parse(localStorage.getItem('productos_bunker'));
-    if (guardados && guardados.length > 0) {
-      setListaProductos(guardados);
-    } else {
-      setListaProductos(productosBunker); 
-    }
+    const fetchProductos = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/api/producto');
+        const data = await response.json();
+        setListaProductos(data);
+      } catch (error) {
+        console.error("Error obteniendo los productos:", error);
+      }
+    };
+
+    fetchProductos();
   }, []);
 
   const productosFiltrados = categoriaActiva === 'Todas'

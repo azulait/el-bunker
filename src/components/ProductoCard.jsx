@@ -9,6 +9,39 @@ export function ProductoCard({ producto }) {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
+  // Función para guardar el producto en el carrito (localStorage)
+  const agregarAlCarrito = (e) => {
+    e.stopPropagation(); // Evita que se abra el modal al hacer clic en el botón
+    
+    try {
+      // 1. Obtenemos el carrito actual guardado
+      const carritoGuardado = localStorage.getItem('carrito_bunker');
+      let carrito = carritoGuardado ? JSON.parse(carritoGuardado) : [];
+      
+      // 2. Verificamos si el producto ya está en el carrito
+      const existe = carrito.find(item => item.id === producto.id);
+      
+      if (existe) {
+        // Si existe, le sumamos 1 a la cantidad
+        carrito = carrito.map(item => 
+          item.id === producto.id ? { ...item, cantidad: item.cantidad + 1 } : item
+        );
+      } else {
+        // Si no existe, lo agregamos con cantidad 1
+        carrito.push({ ...producto, cantidad: 1 });
+      }
+      
+      // 3. Guardamos el carrito actualizado
+      localStorage.setItem('carrito_bunker', JSON.stringify(carrito));
+      
+      // Opcional: Una pequeña alerta visual para el usuario
+      alert(`${producto.nombre} agregado al carrito exitosamente.`);
+      
+    } catch (error) {
+      console.error("Error al agregar al carrito:", error);
+    }
+  };
+
   return (
     <>
       <Card 
@@ -24,10 +57,7 @@ export function ProductoCard({ producto }) {
           <Button 
             variant="danger" 
             className="mt-auto"
-            onClick={(e) => {
-              e.stopPropagation(); 
-              console.log("Agregado al carrito:", producto.nombre);
-            }}
+            onClick={agregarAlCarrito}
           >
             Agregar al Carrito
           </Button>
@@ -35,7 +65,7 @@ export function ProductoCard({ producto }) {
       </Card>
 
       <Modal show={show} onHide={handleClose} centered>
-        <Modal.Header closeButton className="bg-dark text-danger">
+        <Modal.Header closeButton className="bg-dark text-danger border-secondary">
           <Modal.Title>{producto.nombre}</Modal.Title>
         </Modal.Header>
         <Modal.Body className="bg-dark text-white">
@@ -45,14 +75,10 @@ export function ProductoCard({ producto }) {
           <Button 
             variant="danger" 
             className="mt-auto"
-            onClick={(e) => {
-              e.stopPropagation(); 
-              console.log("Agregado al carrito:", producto.nombre);
-            }}
+            onClick={agregarAlCarrito}
           >
             Agregar al Carrito
           </Button>
-          
         </Modal.Footer>
       </Modal>
     </>

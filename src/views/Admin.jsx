@@ -22,21 +22,21 @@ export function Admin() {
           <Tab eventKey="usuarios" title="Gestión de Usuarios">
             <div className="p-3 border border-secondary rounded mt-2">
               <h3 className="texto-amarillo">CRUD de Usuarios</h3>
-              <p><CrudUsuarios /></p>
+              <CrudUsuarios />
             </div>
           </Tab>
 
           <Tab eventKey="productos" title="Gestión de Productos">
             <div className="p-3 border border-secondary rounded mt-2">
               <h3 className="texto-amarillo">CRUD de Productos</h3>
-              <p><CrudProductos /></p>
+              <CrudProductos />
             </div>
           </Tab>
 
           <Tab eventKey="zombies" title="Blog de Zombies">
             <div className="p-3 border border-secondary rounded mt-2">
               <h3 className="texto-amarillo">CRUD de Zombies</h3>
-              <p><CrudZombies /></p>
+              <CrudZombies />
             </div>
           </Tab>
         </Tabs>
@@ -46,3 +46,6 @@ export function Admin() {
 }
 
 export default Admin;
+
+//admin@elbunker.cl
+//admin123

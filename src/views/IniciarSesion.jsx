@@ -12,9 +12,10 @@ export default function IniciarSesion({ setUsuario }) {
     setCredenciales({ ...credenciales, [e.target.name]: e.target.value });
   };
 
-  const handleIniciarSesion = (e) => {
+  const handleIniciarSesion = async (e) => {
     e.preventDefault();
 
+    // Mantener el admin hardcodeado (opcional) o moverlo a la base de datos
     if (credenciales.correo === 'admin@elbunker.cl' && credenciales.password === 'admin123') {
       const adminData = {
         nombre: 'Comandante Admin',
@@ -24,60 +25,79 @@ export default function IniciarSesion({ setUsuario }) {
       
       localStorage.setItem('usuario_activo', JSON.stringify(adminData));
       if (setUsuario) setUsuario(adminData);
-      navigate('/admin'); // Lo enviamos al admin
+      navigate('/admin');
       return;
     }
 
-    const usuariosRegistrados = JSON.parse(localStorage.getItem('usuarios')) || [];
-    
-    const usuarioEncontrado = usuariosRegistrados.find(
-      u => u.email === credenciales.correo && u.password === credenciales.password
-    );
-
-    if (usuarioEncontrado) {
-      localStorage.setItem('usuario_activo', JSON.stringify(usuarioEncontrado));
-      if (setUsuario) setUsuario(usuarioEncontrado); 
+    try {
+      // 1. Consultar a la nueva base de datos (GET)
+      const response = await fetch('http://localhost:8080/api/usuario');
+      const usuariosRegistrados = await response.json();
       
-      if (usuarioEncontrado.esAdmin) {
-        navigate('/admin');
+      // 2. Buscar si las credenciales coinciden
+      const usuarioEncontrado = usuariosRegistrados.find(
+        u => u.email === credenciales.correo && u.password === credenciales.password
+      );
+
+      if (usuarioEncontrado) {
+        // Mantener 'usuario_activo' en localStorage para la sesión actual del navegador
+        localStorage.setItem('usuario_activo', JSON.stringify(usuarioEncontrado));
+        if (setUsuario) setUsuario(usuarioEncontrado); 
+        
+        if (usuarioEncontrado.esAdmin) {
+          navigate('/admin');
+        } else {
+          navigate('/categorias');
+        }
       } else {
-        navigate('/categorias');
+        setError('Correo o contraseña incorrectos, o usuario no registrado.');
       }
-    } else {
-      setError('Correo o contraseña incorrectos, o usuario no registrado.');
+    } catch (err) {
+      console.error(err);
+      setError('Error al conectar con la base de datos del Búnker.');
     }
   };
 
-const loginConGoogle = useGoogleLogin({
+  const loginConGoogle = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
-        const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        const resGoogle = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
           headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
         });
-        const userInfo = await res.json();
+        const userInfo = await resGoogle.json();
 
-        const usuariosRegistrados = JSON.parse(localStorage.getItem('usuarios')) || [];
+        // 1. Verificar en la base de datos si el usuario de Google ya existe
+        const resDb = await fetch('http://localhost:8080/api/usuario');
+        const usuariosRegistrados = await resDb.json();
         let usuarioExistente = usuariosRegistrados.find(u => u.email === userInfo.email);
 
- 
+        // 2. Si no existe, lo guardamos en la base de datos (POST)
         if (!usuarioExistente) {
-          usuarioExistente = {
-            id: Date.now(),
+          const nuevoUsuario = {
             nombre: userInfo.name,
             email: userInfo.email,
+            password: '', // Sin contraseña porque entra con Google
             esAdmin: false,
             avatar: userInfo.picture
           };
-          usuariosRegistrados.push(usuarioExistente);
-          localStorage.setItem('usuarios', JSON.stringify(usuariosRegistrados));
+
+          const createRes = await fetch('http://localhost:8080/api/usuario', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(nuevoUsuario)
+          });
+          
+          usuarioExistente = await createRes.json();
         }
 
+        // 3. Iniciar sesión en el frontend
         localStorage.setItem('usuario_activo', JSON.stringify(usuarioExistente));
         if (setUsuario) setUsuario(usuarioExistente);
 
         navigate('/inicio'); 
       } catch (err) {
-        setError('Error al iniciar sesión con Google.');
+        console.error(err);
+        setError('Error al iniciar sesión con Google o conectar con la base de datos.');
       }
     },
     onError: () => setError('Inicio de sesión con Google cancelado.'),
@@ -119,7 +139,7 @@ const loginConGoogle = useGoogleLogin({
           </Button>
         </Form>
 
-<div className="my-3 text-center">
+      <div className="my-3 text-center">
         <span className="text-muted">o</span>
       </div>
 

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Table, Button, Alert } from 'react-bootstrap';
-import { productosBunker } from '../data/productos';
 import { useNavigate } from 'react-router-dom';
 
 export default function Carrito() {
   const navigate = useNavigate();
+  
+  const [productos, setProductos] = useState([]);
+
   const [carrito, setCarrito] = useState(() => {
     const carritoGuardado = localStorage.getItem('carrito_bunker');
     if (carritoGuardado) {
@@ -14,11 +16,22 @@ export default function Carrito() {
         console.error("Error al leer localStorage", e);
       }
     }
-    return [
-      { ...productosBunker[0], cantidad: 1 },
-      { ...productosBunker[1], cantidad: 1 }
-    ];
+    return []; 
   });
+
+  useEffect(() => {
+    const fetchProductos = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/api/producto');
+        const data = await response.json();
+        setProductos(data);
+      } catch (error) {
+        console.error("Error obteniendo los productos:", error);
+      }
+    };
+
+    fetchProductos();
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('carrito_bunker', JSON.stringify(carrito));
@@ -62,11 +75,10 @@ export default function Carrito() {
       </Alert>
 
       <Row>
-        {/* lado izquierdo de la pagina */}
         <Col lg={6} md={12} className="mb-4">
           <h3 className="mb-3 text-white">Lista de productos</h3>
           <Row xs={1} sm={2} md={3} className="g-3">
-            {productosBunker.map((prod) => (
+            {productos.map((prod) => (
               <Col key={prod.id}>
                 <Card className="h-100 text-center shadow-sm bg-dark text-white border-secondary">
                   <Card.Img
@@ -96,7 +108,6 @@ export default function Carrito() {
           </Row>
         </Col>
 
-        {/* lado derecho de la pagina */}
         <Col lg={6} md={12}>
           <h3 className="mb-3 text-white">Carrito de Compras</h3>
           <Card className="shadow-sm p-3 bg-dark text-white border-secondary">

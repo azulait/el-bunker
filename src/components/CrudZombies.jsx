@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form } from 'react-bootstrap';
-// 1. Importamos tus datos estáticos
-import { ZombiesBunker } from '../data/zombies';
 
 export function CrudZombies() {
   const [zombies, setZombies] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   
-  // 2. Adaptamos el estado a tu estructura de datos
   const [formData, setFormData] = useState({
     id: '',
     nombre: '',
@@ -20,23 +17,20 @@ export function CrudZombies() {
     consejo: ''
   });
 
-  // 3. Cargar datos iniciales (De LocalStorage o de tu archivo JS)
-  useEffect(() => {
-    const zombiesGuardados = JSON.parse(localStorage.getItem('zombies_bunker'));
-    
-    if (zombiesGuardados && zombiesGuardados.length > 0) {
-      setZombies(zombiesGuardados);
-    } else {
-      // Si no hay datos en localStorage, carga los de zombies.js por defecto
-      setZombies(ZombiesBunker);
-      localStorage.setItem('zombies_bunker', JSON.stringify(ZombiesBunker));
+  // 1. Obtener datos desde la base de datos (GET)
+  const fetchZombies = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/zombie');
+      const data = await response.json();
+      setZombies(data);
+    } catch (error) {
+      console.error("Error obteniendo zombies:", error);
     }
-  }, []);
-
-  const guardarDatos = (nuevosZombies) => {
-    localStorage.setItem('zombies_bunker', JSON.stringify(nuevosZombies));
-    setZombies(nuevosZombies);
   };
+
+  useEffect(() => {
+    fetchZombies();
+  }, []);
 
   const handleClose = () => {
     setShowModal(false);
@@ -50,17 +44,32 @@ export function CrudZombies() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  // 2. Guardar (POST) o Actualizar (PUT) en la base de datos
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editMode) {
-      const zombiesActualizados = zombies.map(z => z.id === formData.id ? formData : z);
-      guardarDatos(zombiesActualizados);
-    } else {
-      // Crear nuevo asignando un ID numérico basado en la hora para que no se repita
-      const nuevoZombie = { ...formData, id: Date.now() };
-      guardarDatos([...zombies, nuevoZombie]);
+    try {
+      if (editMode) {
+        // Actualizar existente
+        await fetch(`http://localhost:8080/api/zombie/${formData.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+      } else {
+        // Crear nuevo (desestructuramos para quitar el 'id' vacío y que SQL lo asigne)
+        const { id, ...zombieSinId } = formData;
+        await fetch('http://localhost:8080/api/zombie', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(zombieSinId)
+        });
+      }
+      // Refrescar la tabla consultando de nuevo a la base de datos
+      fetchZombies();
+      handleClose();
+    } catch (error) {
+      console.error("Error al guardar el zombie:", error);
     }
-    handleClose();
   };
 
   const handleEdit = (zombie) => {
@@ -69,10 +78,18 @@ export function CrudZombies() {
     setShowModal(true);
   };
 
-  const handleDelete = (id) => {
+  // 3. Eliminar de la base de datos (DELETE)
+  const handleDelete = async (id) => {
     if (window.confirm('¿Estás seguro de eliminar este registro del Búnker?')) {
-      const zombiesFiltrados = zombies.filter(z => z.id !== id);
-      guardarDatos(zombiesFiltrados);
+      try {
+        await fetch(`http://localhost:8080/api/zombie/${id}`, {
+          method: 'DELETE'
+        });
+        // Refrescar la tabla
+        fetchZombies();
+      } catch (error) {
+        console.error("Error al eliminar el zombie:", error);
+      }
     }
   };
 
