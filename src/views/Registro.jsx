@@ -18,68 +18,100 @@ export function Registro({ setUsuario }) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  // 1. Registro manual conectado a Spring Boot
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const usuariosRegistrados = JSON.parse(localStorage.getItem('usuarios')) || [];
     
-    const existe = usuariosRegistrados.find(u => u.email === formData.email);
-    if (existe) {
+    try {
+      // Verificamos si el correo ya existe en la Base de Datos
+      const resGet = await fetch('http://localhost:8080/api/usuario');
+      const usuariosRegistrados = await resGet.json();
+      const existe = usuariosRegistrados.find(u => u.email === formData.email);
+
+      if (existe) {
+        setTipoAlerta('danger');
+        setMensaje('Este correo ya se encuentra registrado.');
+        return;
+      }
+
+      // Preparamos el usuario uniendo nombre y apellido para el backend
+      const nuevoUsuario = { 
+        nombre: `${formData.nombre} ${formData.apellidos}`.trim(),
+        email: formData.email,
+        password: formData.password,
+        esAdmin: false 
+      };
+
+      // Guardamos en la base de datos (POST)
+      const response = await fetch('http://localhost:8080/api/usuario', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nuevoUsuario)
+      });
+
+      if (response.ok) {
+        setTipoAlerta('success');
+        setMensaje('¡Registro exitoso! Redirigiendo al inicio de sesión...');
+        setTimeout(() => {
+          navigate('/iniciar-sesion');
+        }, 1500);
+      } else {
+        setTipoAlerta('danger');
+        setMensaje('Error al registrar el usuario en el servidor.');
+      }
+    } catch (error) {
+      console.error(error);
       setTipoAlerta('danger');
-      setMensaje('Este correo ya se encuentra registrado.');
-      return;
+      setMensaje('Error de conexión con la base de datos del Búnker.');
     }
-
-    const nuevoUsuario = { 
-      ...formData, 
-      id: Date.now().toString(), 
-      esAdmin: false 
-    };
-
-    usuariosRegistrados.push(nuevoUsuario);
-    localStorage.setItem('usuarios', JSON.stringify(usuariosRegistrados));
-    
-    setTipoAlerta('success');
-    setMensaje('¡Registro exitoso! Redirigiendo al inicio de sesión...');
-    
-    setTimeout(() => {
-      navigate('/iniciar-sesion');
-    }, 1500);
   };
 
-const registroConGoogle = useGoogleLogin({
+  // 2. Registro con Google conectado a Spring Boot
+  const registroConGoogle = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
-        const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        const resGoogle = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
           headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
         });
-        const userInfo = await res.json();
+        const userInfo = await resGoogle.json();
 
-        const usuariosGuardados = JSON.parse(localStorage.getItem('usuarios')) || [];
+        // Consultamos la BD
+        const resDb = await fetch('http://localhost:8080/api/usuario');
+        const usuariosGuardados = await resDb.json();
         let usuarioExistente = usuariosGuardados.find(u => u.email === userInfo.email);
 
+        // Si no existe, lo creamos en la BD
         if (!usuarioExistente) {
-          usuarioExistente = {
-            id: Date.now(),
-            nombre: userInfo.given_name || userInfo.name,
-            apellidos: userInfo.family_name || '',
+          const nuevoUsuario = {
+            nombre: `${userInfo.given_name || userInfo.name} ${userInfo.family_name || ''}`.trim(),
             email: userInfo.email,
-            rol: 'cliente',
+            password: '',
+            esAdmin: false,
             avatar: userInfo.picture
           };
-          usuariosGuardados.push(usuarioExistente);
-          localStorage.setItem('usuarios', JSON.stringify(usuariosGuardados));
+
+          const createRes = await fetch('http://localhost:8080/api/usuario', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(nuevoUsuario)
+          });
+          usuarioExistente = await createRes.json();
         }
 
+        // Activamos la sesión en el frontend
         localStorage.setItem('usuario_activo', JSON.stringify(usuarioExistente));
         if (setUsuario) setUsuario(usuarioExistente);
         navigate('/inicio');
 
       } catch (err) {
         console.error("Error al registrarse con Google:", err);
+        setTipoAlerta('danger');
+        setMensaje('Error al conectar con la base de datos.');
       }
     },
     onError: () => console.log('Registro con Google cancelado'),
   });
+
   return (
     <Container className="my-5" style={{ maxWidth: '500px' }}>
       <Card className="shadow-lg p-4 bg-dark text-white border-secondary">
@@ -113,7 +145,6 @@ const registroConGoogle = useGoogleLogin({
 
           <Form.Group className="mb-3">
             <Form.Label>Correo Electrónico</Form.Label>
-            {/* Cambiado el name a 'email' */}
             <Form.Control
               type="email"
               name="email"
