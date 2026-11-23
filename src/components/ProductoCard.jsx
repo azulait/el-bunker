@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import Button from 'react-bootstrap/Button';
-import Card from 'react-bootstrap/Card';
-import Modal from 'react-bootstrap/Modal';
+import { Card, Modal } from 'react-bootstrap';
 
 export function ProductoCard({ producto }) {
   const [show, setShow] = useState(false);
@@ -9,34 +7,25 @@ export function ProductoCard({ producto }) {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
-  // Función para guardar el producto en el carrito (localStorage)
   const agregarAlCarrito = (e) => {
-    e.stopPropagation(); // Evita que se abra el modal al hacer clic en el botón
+    e.stopPropagation(); 
     
     try {
-      // 1. Obtenemos el carrito actual guardado
       const carritoGuardado = localStorage.getItem('carrito_bunker');
       let carrito = carritoGuardado ? JSON.parse(carritoGuardado) : [];
       
-      // 2. Verificamos si el producto ya está en el carrito
       const existe = carrito.find(item => item.id === producto.id);
       
       if (existe) {
-        // Si existe, le sumamos 1 a la cantidad
         carrito = carrito.map(item => 
           item.id === producto.id ? { ...item, cantidad: item.cantidad + 1 } : item
         );
       } else {
-        // Si no existe, lo agregamos con cantidad 1
         carrito.push({ ...producto, cantidad: 1 });
       }
       
-      // 3. Guardamos el carrito actualizado
       localStorage.setItem('carrito_bunker', JSON.stringify(carrito));
-      
-      // Opcional: Una pequeña alerta visual para el usuario
       alert(`${producto.nombre} agregado al carrito exitosamente.`);
-      
     } catch (error) {
       console.error("Error al agregar al carrito:", error);
     }
@@ -44,41 +33,63 @@ export function ProductoCard({ producto }) {
 
   return (
     <>
+      {/* Reemplazamos bg-dark y border-secondary por tu clase card-estilos */}
       <Card 
-        className="h-100 bg-dark text-white border-secondary" 
+        className="card-estilos h-100 text-center" 
         style={{ cursor: 'pointer' }} 
         onClick={handleShow}
       >
-        <Card.Img variant="top" src={producto.imagen} alt={producto.nombre} style={{ height: '250px', objectFit: 'cover' }}/>
+        {/* Aplicamos img-estilos para el fondo oscuro y borde inferior en la imagen */}
+        <Card.Img 
+          variant="top" 
+          src={producto.imagen} 
+          alt={producto.nombre} 
+          className="img-estilos"
+          style={{ height: '250px', objectFit: 'contain' }} 
+        />
         <Card.Body className="d-flex flex-column">
-          <Card.Title className="text-danger">{producto.nombre}</Card.Title>
-          <Card.Text className="fw-bold fs-5">${producto.precio.toLocaleString('es-CL')}</Card.Text>
+          {/* Título del producto usando la fuente temática pero con un tamaño controlado */}
+          <Card.Title 
+            className="texto-rojo mb-3" 
+            style={{ fontFamily: "'Shlop', cursive, sans-serif", fontSize: '2rem', letterSpacing: '2px' }}
+          >
+            {producto.nombre.toUpperCase()}
+          </Card.Title>
           
-          <Button 
-            variant="danger" 
-            className="mt-auto"
+          <Card.Text className="texto-blanco fw-bold mb-4" style={{ fontSize: '1.5rem', fontFamily: 'sans-serif' }}>
+            ${producto.precio.toLocaleString('es-CL')}
+          </Card.Text>
+          
+          {/* Reemplazamos Button variant="danger" por el botón html con tu clase btn-estilos */}
+          <button 
+            className="btn btn-estilos mt-auto w-100 p-2 fs-5"
             onClick={agregarAlCarrito}
           >
-            Agregar al Carrito
-          </Button>
+            AÑADIR AL CARRITO
+          </button>
         </Card.Body>
       </Card>
 
-      <Modal show={show} onHide={handleClose} centered>
-        <Modal.Header closeButton className="bg-dark text-danger border-secondary">
-          <Modal.Title>{producto.nombre}</Modal.Title>
+      {/* contentClassName aplica tu modal-estilos (borde y sombra roja) al contenedor interno del modal */}
+      <Modal show={show} onHide={handleClose} centered contentClassName="modal-estilos">
+        <Modal.Header closeButton closeVariant="white" className="border-bottom border-danger">
+          <Modal.Title 
+            className="texto-rojo" 
+            style={{ fontFamily: "'Shlop', cursive, sans-serif", fontSize: '2.5rem', letterSpacing: '2px' }}
+          >
+            {producto.nombre.toUpperCase()}
+          </Modal.Title>
         </Modal.Header>
-        <Modal.Body className="bg-dark text-white">
+        <Modal.Body className="texto-blanco" style={{ fontFamily: 'sans-serif', fontSize: '1.2rem' }}>
           {producto.descripcion}
         </Modal.Body>
-        <Modal.Footer className="bg-dark border-secondary">
-          <Button 
-            variant="danger" 
-            className="mt-auto"
+        <Modal.Footer className="border-top border-danger">
+          <button 
+            className="btn btn-estilos w-100 p-2 fs-5"
             onClick={agregarAlCarrito}
           >
-            Agregar al Carrito
-          </Button>
+            AÑADIR AL CARRITO
+          </button>
         </Modal.Footer>
       </Modal>
     </>

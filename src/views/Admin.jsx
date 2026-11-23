@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Card, Tabs, Tab } from 'react-bootstrap';
+import { Container, Nav } from 'react-bootstrap';
 import { CrudZombies } from '../components/CrudZombies';
 import { CrudProductos } from '../components/CrudProductos';
 import { CrudUsuarios } from '../components/CrudUsuarios';
@@ -8,43 +8,89 @@ export function Admin() {
   const [pestañaActiva, setPestañaActiva] = useState('usuarios');
 
   return (
-    <Container className="py-5 text-white">
-      <h1 className="text-center texto-rojo fuente-bunker mb-4">PANEL DE CONTROL ADMIN</h1>
+    <Container className="py-5">
+      <h1 
+        className="TituloZombie texto-rojo text-center mb-5" 
+        style={{ fontSize: '4rem', letterSpacing: '3px' }}
+      >
+        SISTEMA CENTRAL - NIVEL ADMIN
+      </h1>
       
-      <Card className="bg-dark text-white border-danger shadow-lg p-3">
-        <Tabs
-          id="admin-tabs"
+      <div className="panel-bunker p-4 p-md-5 shadow-lg">
+        
+        <Nav
+          variant="pills"
           activeKey={pestañaActiva}
           onSelect={(k) => setPestañaActiva(k)}
-          className="mb-3"
-          variant="pills"
+          className="justify-content-center mb-4 gap-3 border-bottom border-danger pb-4"
         >
-          <Tab eventKey="usuarios" title="Gestión de Usuarios">
-            <div className="p-3 border border-secondary rounded mt-2">
-              <h3 className="texto-amarillo">CRUD de Usuarios</h3>
+          <Nav.Item>
+            <Nav.Link 
+              eventKey="usuarios" 
+              className={`btn-categoria ${pestañaActiva === 'usuarios' ? 'active' : ''}`}
+            >
+              SUPERVIVIENTES
+            </Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link 
+              eventKey="productos" 
+              className={`btn-categoria ${pestañaActiva === 'productos' ? 'active' : ''}`}
+            >
+              SUMINISTROS
+            </Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link 
+              eventKey="zombies" 
+              className={`btn-categoria ${pestañaActiva === 'zombies' ? 'active' : ''}`}
+            >
+              ARCHIVOS INFECTADOS
+            </Nav.Link>
+          </Nav.Item>
+        </Nav>
+
+        <div className="mt-4">
+          {pestañaActiva === 'usuarios' && (
+            <div>
+              <h3 
+                className="texto-amarillo mb-4" 
+                style={{ fontFamily: "'Shlop', cursive, sans-serif", fontSize: '2.5rem', letterSpacing: '2px' }}
+              >
+                GESTIÓN DE PERSONAL REGISTRADO
+              </h3>
               <CrudUsuarios />
             </div>
-          </Tab>
+          )}
 
-          <Tab eventKey="productos" title="Gestión de Productos">
-            <div className="p-3 border border-secondary rounded mt-2">
-              <h3 className="texto-amarillo">CRUD de Productos</h3>
+          {pestañaActiva === 'productos' && (
+            <div>
+              <h3 
+                className="texto-amarillo mb-4" 
+                style={{ fontFamily: "'Shlop', cursive, sans-serif", fontSize: '2.5rem', letterSpacing: '2px' }}
+              >
+                CONTROL DE INVENTARIO
+              </h3>
               <CrudProductos />
             </div>
-          </Tab>
+          )}
 
-          <Tab eventKey="zombies" title="Blog de Zombies">
-            <div className="p-3 border border-secondary rounded mt-2">
-              <h3 className="texto-amarillo">CRUD de Zombies</h3>
+          {pestañaActiva === 'zombies' && (
+            <div>
+              <h3 
+                className="texto-amarillo mb-4" 
+                style={{ fontFamily: "'Shlop', cursive, sans-serif", fontSize: '2.5rem', letterSpacing: '2px' }}
+              >
+                BASE DE DATOS DE AMENAZAS
+              </h3>
               <CrudZombies />
             </div>
-          </Tab>
-        </Tabs>
-      </Card>
+          )}
+        </div>
+      </div>
     </Container>
   );
 }
-
 export default Admin;
 
 //admin@elbunker.cl

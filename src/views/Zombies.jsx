@@ -1,19 +1,14 @@
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import { ZombiesCard } from '../components/ZombiesCard';
 import React, { useState, useEffect } from 'react';
+import { Container, Row, Col } from 'react-bootstrap';
+import { ZombiesCard } from '../components/ZombiesCard';
 
 export function Zombies() {
-  
   const [listaZombies, setListaZombies] = useState([]);
 
   useEffect(() => {
-    // Petición a tu API de Spring Boot
     fetch('http://localhost:8080/api/zombie')
       .then(respuesta => respuesta.json())
       .then(datos => {
-        // Guarda los datos de MySQL en el estado
         setListaZombies(datos);
       })
       .catch(error => {
@@ -22,18 +17,27 @@ export function Zombies() {
   }, []);
   
   return (
-    <Container className="py-5">
-      <h2 className="TituloBunker texto-verde text-center mb-3">
+    <Container className="mt-5 py-4 text-center">
+      <h2 className="TituloBunker texto-verde mb-4" style={{ fontSize: '5rem' }}>
         LOS INFECTADOS
       </h2>
-      <p className="text-center text-light mb-50 fs-50">
-        "Si conoces al enemigo y te conoces a ti mismo, no debes temer el resultado de cien batallas"
-      </p>
-      <p className="text-center texto-amarillo mb-50 fs-50">
-        - El chino del arte de la guerra.
-      </p>
+      
+      <div className="mb-5">
+        <p 
+          className="texto-blanco mb-2" 
+          style={{ fontFamily: "'Shlop', cursive, sans-serif", fontSize: '2.5rem', letterSpacing: '2px' }}
+        >
+          "SI CONOCES AL ENEMIGO Y TE CONOCES A TI MISMO, NO DEBES TEMER EL RESULTADO DE CIEN BATALLAS"
+        </p>
+        <p 
+          className="texto-amarillo" 
+          style={{ fontFamily: "'Shlop', cursive, sans-serif", fontSize: '2rem', letterSpacing: '2px' }}
+        >
+          - EL CHINO DEL ARTE DE LA GUERRA.
+        </p>
+      </div>
 
-      <Row className="justify-content-center">
+      <Row className="justify-content-center g-5">
         {listaZombies.map((zombie) => (
           <Col key={zombie.id} xs={12} lg={10}>
             <ZombiesCard zombie={zombie} />

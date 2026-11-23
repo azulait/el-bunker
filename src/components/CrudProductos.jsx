@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form } from 'react-bootstrap';
+import { Table, Modal, Form } from 'react-bootstrap';
 
 export function CrudProductos() {
   const [productos, setProductos] = useState([]);
@@ -15,7 +15,6 @@ export function CrudProductos() {
     descripcion: ''
   });
 
-  // 1. Obtener datos desde la base de datos (GET)
   const fetchProductos = async () => {
     try {
       const response = await fetch('http://localhost:8080/api/producto');
@@ -42,21 +41,18 @@ export function CrudProductos() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // 2. Guardar (POST) o Actualizar (PUT) en la base de datos
   const handleSubmit = async (e) => {
     e.preventDefault();
     const productoProcesado = { ...formData, precio: Number(formData.precio) };
 
     try {
       if (editMode) {
-        // Actualizar existente
         await fetch(`http://localhost:8080/api/producto/${formData.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(productoProcesado)
         });
       } else {
-        // Crear nuevo (SQL se encarga de asignar el ID)
         const { id, ...productoSinId } = productoProcesado;
         await fetch('http://localhost:8080/api/producto', {
           method: 'POST',
@@ -64,7 +60,6 @@ export function CrudProductos() {
           body: JSON.stringify(productoSinId)
         });
       }
-      // Refrescar la tabla con los datos reales de la base de datos
       fetchProductos();
       handleClose();
     } catch (error) {
@@ -78,14 +73,12 @@ export function CrudProductos() {
     setShowModal(true);
   };
 
-  // 3. Eliminar de la base de datos (DELETE)
   const handleDelete = async (id) => {
-    if (window.confirm('¿Estás seguro de eliminar este suministro del inventario?')) {
+    if (window.confirm('¿Estás seguro de eliminar este suministro del inventario? Esta acción es irreversible.')) {
       try {
         await fetch(`http://localhost:8080/api/producto/${id}`, {
           method: 'DELETE'
         });
-        // Refrescar la tabla
         fetchProductos();
       } catch (error) {
         console.error("Error al eliminar el producto:", error);
@@ -95,71 +88,127 @@ export function CrudProductos() {
 
   return (
     <div>
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4 className="texto-amarillo mb-0">Gestión de Inventario</h4>
-        <Button variant="danger" onClick={handleShow} className="fw-bold">
-          + Nuevo Producto
-        </Button>
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+        <h4 className="texto-verde mb-3 mb-md-0" style={{ fontFamily: 'sans-serif', fontWeight: 'bold' }}>
+          INVENTARIO DE SUMINISTROS
+        </h4>
+        <button onClick={handleShow} className="btn btn-estilos px-4 py-2">
+          + NUEVO SUMINISTRO
+        </button>
       </div>
 
-      <Table striped bordered hover variant="dark" responsive>
-        <thead>
-          <tr>
-            <th>Imagen</th>
-            <th>Nombre</th>
-            <th>Categoría</th>
-            <th>Precio</th>
-            <th>Descripción</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {productos.map((producto) => (
-            <tr key={producto.id}>
-              <td>
-                <img src={producto.imagen} alt={producto.nombre} style={{width: '50px', height: '50px', objectFit: 'cover', borderRadius: '5px'}} />
-              </td>
-              <td className="fw-bold">{producto.nombre}</td>
-              <td>
-                <span className={`badge ${producto.categoria === 'Armas' ? 'bg-danger' : 'bg-success'}`}>
-                  {producto.categoria}
-                </span>
-              </td>
-              <td className="texto-amarillo fw-bold">${producto.precio}</td>
-              <td>{producto.descripcion.substring(0, 50)}...</td>
-              <td>
-                <Button variant="outline-info" size="sm" className="me-2 mb-1" onClick={() => handleEdit(producto)}>
-                  Editar
-                </Button>
-                <Button variant="outline-danger" size="sm" className="mb-1" onClick={() => handleDelete(producto.id)}>
-                  Eliminar
-                </Button>
-              </td>
+      <div className="table-responsive mb-4">
+        <Table variant="dark" borderless align="middle" className="m-0 text-white" style={{ fontFamily: 'sans-serif', backgroundColor: 'transparent' }}>
+          <thead>
+            {/* Cambiado text-secondary por text-white */}
+            <tr className="border-bottom text-white" style={{ borderColor: '#444' }}>
+              <th className="pb-3">Imagen</th>
+              <th className="pb-3">Nombre</th>
+              <th className="pb-3 text-center">Categoría</th>
+              <th className="pb-3">Precio</th>
+              <th className="pb-3">Descripción</th>
+              <th className="pb-3 text-end">Acciones Tácticas</th>
             </tr>
-          ))}
-        </tbody>
-      </Table>
+          </thead>
+          <tbody>
+            {productos.length === 0 ? (
+              <tr>
+                {/* Cambiado text-muted por text-white */}
+                <td colSpan="6" className="text-center text-white py-4">No hay suministros registrados en el búnker.</td>
+              </tr>
+            ) : (
+              productos.map((producto) => (
+                <tr key={producto.id} className="border-bottom" style={{ borderColor: '#222' }}>
+                  <td className="py-2">
+                    <img 
+                      src={producto.imagen} 
+                      alt={producto.nombre} 
+                      style={{width: '50px', height: '50px', objectFit: 'contain', backgroundColor: '#0d0d0d', borderRadius: '4px'}} 
+                    />
+                  </td>
+                  <td className="py-3 fw-bold text-white">{producto.nombre.toUpperCase()}</td>
+                  <td className="py-3 text-center">
+                    <span 
+                      className={`badge border px-2 py-1 bg-transparent ${
+                        producto.categoria === 'Armas' ? 'border-danger text-danger' : 'border-success text-success'
+                      }`}
+                    >
+                      {producto.categoria.toUpperCase()}
+                    </span>
+                  </td>
+                  <td className="py-3 fw-bold texto-amarillo">\${producto.precio.toLocaleString()}</td>
+                  {/* Cambiado text-muted por text-white */}
+                  <td className="py-3 text-white" style={{ fontSize: '0.85rem' }}>
+                    {producto.descripcion.length > 40 ? `${producto.descripcion.substring(0, 40)}...` : producto.descripcion}
+                  </td>
+                  <td className="py-3 text-end">
+                    <button 
+                      className="btn btn-outline-warning btn-sm me-2 fw-bold" 
+                      onClick={() => handleEdit(producto)}
+                      style={{ fontSize: '0.8rem' }}
+                    >
+                      MODIFICAR
+                    </button>
+                    <button 
+                      className="btn btn-outline-danger btn-sm fw-bold" 
+                      onClick={() => handleDelete(producto.id)}
+                      style={{ fontSize: '0.8rem' }}
+                    >
+                      ELIMINAR
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </Table>
+      </div>
 
-      <Modal show={showModal} onHide={handleClose} data-bs-theme="dark" className="text-white" size="lg">
-        <Modal.Header closeButton className="bg-dark border-secondary">
-          <Modal.Title>{editMode ? 'Editar Producto' : 'Registrar Nuevo Producto'}</Modal.Title>
-        </Modal.Header>
-        <Form onSubmit={handleSubmit}>
-          <Modal.Body className="bg-dark">
+      <Modal 
+        show={showModal} 
+        onHide={handleClose} 
+        backdrop="static"
+        contentClassName="panel-bunker p-2"
+        size="lg"
+        centered
+      >
+        <Form onSubmit={handleSubmit} style={{ fontFamily: 'sans-serif' }}>
+          <Modal.Header className="border-bottom border-danger">
+            <Modal.Title className="texto-rojo fw-bold" style={{ fontFamily: "'Shlop', cursive, sans-serif", fontSize: '2rem', letterSpacing: '1px' }}>
+              {editMode ? 'MODIFICAR SUMINISTRO' : 'REGISTRAR NUEVO SUMINISTRO'}
+            </Modal.Title>
+            <button type="button" className="btn-close btn-close-white" onClick={handleClose} aria-label="Close"></button>
+          </Modal.Header>
+          
+          <Modal.Body className="py-4">
             <div className="row">
               <div className="col-md-6">
-                <Form.Group className="mb-3">
-                  <Form.Label>Nombre del suministro</Form.Label>
-                  <Form.Control type="text" name="nombre" value={formData.nombre} onChange={handleChange} required />
+                <Form.Group className="mb-4">
+                  <Form.Label className="texto-verde fw-bold">Nombre del Suministro *</Form.Label>
+                  <Form.Control 
+                    type="text" 
+                    name="nombre" 
+                    value={formData.nombre} 
+                    onChange={handleChange} 
+                    required 
+                    className="form-bg-bunker"
+                    placeholder="Ej: Bate con Púas"
+                  />
                 </Form.Group>
               </div>
               <div className="col-md-6">
-                <Form.Group className="mb-3">
-                  <Form.Label>Categoría</Form.Label>
-                  <Form.Select name="categoria" value={formData.categoria} onChange={handleChange} required>
+                <Form.Group className="mb-4">
+                  <Form.Label className="texto-verde fw-bold">Clasificación (Categoría) *</Form.Label>
+                  <Form.Select 
+                    name="categoria" 
+                    value={formData.categoria} 
+                    onChange={handleChange} 
+                    required 
+                    className="form-bg-bunker"
+                  >
                     <option value="">Selecciona...</option>
-                    <option value="Armas">Armas</option>
-                    <option value="Kits">Kits</option>
+                    <option value="Armas">Armamento</option>
+                    <option value="Kits">Kits de Supervivencia</option>
                   </Form.Select>
                 </Form.Group>
               </div>
@@ -167,30 +216,57 @@ export function CrudProductos() {
 
             <div className="row">
               <div className="col-md-6">
-                <Form.Group className="mb-3">
-                  <Form.Label>Ruta de la Imagen</Form.Label>
-                  <Form.Control type="text" name="imagen" placeholder="/img/arma.webp" value={formData.imagen} onChange={handleChange} required />
+                <Form.Group className="mb-4">
+                  <Form.Label className="texto-verde fw-bold">Ruta del Archivo Gráfico *</Form.Label>
+                  <Form.Control 
+                    type="text" 
+                    name="imagen" 
+                    placeholder="/img/arma.webp" 
+                    value={formData.imagen} 
+                    onChange={handleChange} 
+                    required 
+                    className="form-bg-bunker"
+                  />
                 </Form.Group>
               </div>
               <div className="col-md-6">
-                <Form.Group className="mb-3">
-                  <Form.Label>Precio ($)</Form.Label>
-                  <Form.Control type="number" name="precio" placeholder="Ej: 15000" value={formData.precio} onChange={handleChange} required />
+                <Form.Group className="mb-4">
+                  <Form.Label className="texto-verde fw-bold">Valor de Intercambio (\$) *</Form.Label>
+                  <Form.Control 
+                    type="number" 
+                    name="precio" 
+                    placeholder="Ej: 15000" 
+                    value={formData.precio} 
+                    onChange={handleChange} 
+                    required 
+                    className="form-bg-bunker"
+                  />
                 </Form.Group>
               </div>
             </div>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Descripción del uso</Form.Label>
-              <Form.Control as="textarea" rows={2} name="descripcion" value={formData.descripcion} onChange={handleChange} required />
+            <Form.Group className="mb-2">
+              <Form.Label className="texto-verde fw-bold">Descripción Táctica *</Form.Label>
+              <Form.Control 
+                as="textarea" 
+                rows={3} 
+                name="descripcion" 
+                value={formData.descripcion} 
+                onChange={handleChange} 
+                required 
+                className="form-bg-bunker"
+                placeholder="Detalles sobre el uso y efectividad del suministro..."
+              />
             </Form.Group>
 
           </Modal.Body>
-          <Modal.Footer className="bg-dark border-secondary">
-            <Button variant="secondary" onClick={handleClose}>Cancelar</Button>
-            <Button variant="danger" type="submit">
-              {editMode ? 'Guardar Cambios' : 'Registrar'}
-            </Button>
+          <Modal.Footer className="border-top border-danger">
+            <button type="button" className="btn btn-outline-secondary fw-bold" onClick={handleClose}>
+              CANCELAR
+            </button>
+            <button type="submit" className="btn btn-estilos px-4">
+              {editMode ? 'ACTUALIZAR DATOS' : 'CREAR REGISTRO'}
+            </button>
           </Modal.Footer>
         </Form>
       </Modal>

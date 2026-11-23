@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form } from 'react-bootstrap';
+import { Table, Modal, Form } from 'react-bootstrap';
 
 export function CrudUsuarios() {
   const [usuarios, setUsuarios] = useState([]);
@@ -14,7 +14,6 @@ export function CrudUsuarios() {
     esAdmin: false
   });
 
-  // 1. Obtener usuarios desde la base de datos (GET)
   const fetchUsuarios = async () => {
     try {
       const response = await fetch('http://localhost:8080/api/usuario');
@@ -45,19 +44,16 @@ export function CrudUsuarios() {
     });
   };
 
-  // 2. Guardar (POST) o Actualizar (PUT) en la base de datos
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (editMode) {
-        // Actualizar existente
         await fetch(`http://localhost:8080/api/usuario/${formData.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData)
         });
       } else {
-        // Crear nuevo (SQL le asignará el ID automáticamente)
         const { id, ...usuarioSinId } = formData;
         await fetch('http://localhost:8080/api/usuario', {
           method: 'POST',
@@ -65,7 +61,6 @@ export function CrudUsuarios() {
           body: JSON.stringify(usuarioSinId)
         });
       }
-      // Refrescar la tabla consultando de nuevo a la BD
       fetchUsuarios();
       handleClose();
     } catch (error) {
@@ -79,14 +74,12 @@ export function CrudUsuarios() {
     setShowModal(true);
   };
 
-  // 3. Eliminar de la base de datos (DELETE)
   const handleDelete = async (id) => {
-    if (window.confirm('¿Estás seguro de expulsar a este sobreviviente del Búnker?')) {
+    if (window.confirm('¿Estás seguro de expulsar a este sobreviviente del Búnker? Esta acción es irreversible.')) {
       try {
         await fetch(`http://localhost:8080/api/usuario/${id}`, {
           method: 'DELETE'
         });
-        // Refrescar la tabla
         fetchUsuarios();
       } catch (error) {
         console.error("Error al eliminar el usuario:", error);
@@ -96,108 +89,148 @@ export function CrudUsuarios() {
 
   return (
     <div>
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4 className="texto-amarillo mb-0">Gestión de Sobrevivientes</h4>
-        <Button variant="danger" onClick={handleShow} className="fw-bold">
-          + Nuevo Usuario
-        </Button>
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4">
+        <h4 className="texto-verde mb-3 mb-md-0" style={{ fontFamily: 'sans-serif', fontWeight: 'bold' }}>
+          PERSONAL REGISTRADO
+        </h4>
+        <button onClick={handleShow} className="btn btn-estilos px-4 py-2">
+          + NUEVO RECLUTA
+        </button>
       </div>
 
-      <Table striped bordered hover variant="dark" responsive>
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Email</th>
-            <th>Rol</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {usuarios.length === 0 ? (
-            <tr>
-              <td colSpan="4" className="text-center">No hay usuarios registrados.</td>
+      <div className="table-responsive mb-4">
+        <Table variant="dark" borderless align="middle" className="m-0 text-white" style={{ fontFamily: 'sans-serif', backgroundColor: 'transparent' }}>
+          <thead>
+            {/* Cambiado text-secondary por text-white */}
+            <tr className="border-bottom text-white" style={{ borderColor: '#444' }}>
+              <th className="pb-3">Nombre</th>
+              <th className="pb-3">Transmisión (Email)</th>
+              <th className="pb-3">Rango</th>
+              <th className="pb-3 text-end">Acciones Tácticas</th>
             </tr>
-          ) : (
-            usuarios.map((usuario) => (
-              <tr key={usuario.id}>
-                <td className="fw-bold">{usuario.nombre}</td>
-                <td>{usuario.email}</td>
-                <td>
-                  <span className={`badge ${usuario.esAdmin ? 'bg-danger' : 'bg-secondary'}`}>
-                    {usuario.esAdmin ? 'Administrador' : 'Sobreviviente'}
-                  </span>
-                </td>
-                <td>
-                  <Button variant="outline-info" size="sm" className="me-2 mb-1" onClick={() => handleEdit(usuario)}>
-                    Editar
-                  </Button>
-                  <Button variant="outline-danger" size="sm" className="mb-1" onClick={() => handleDelete(usuario.id)}>
-                    Eliminar
-                  </Button>
-                </td>
+          </thead>
+          <tbody>
+            {usuarios.length === 0 ? (
+              <tr>
+                {/* Cambiado text-muted por text-white */}
+                <td colSpan="4" className="text-center text-white py-4">No hay sobrevivientes en los registros.</td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </Table>
+            ) : (
+              usuarios.map((usuario) => (
+                <tr key={usuario.id} className="border-bottom" style={{ borderColor: '#222' }}>
+                  <td className="py-3 fw-bold text-white">{usuario.nombre.toUpperCase()}</td>
+                  {/* Cambiado text-muted por text-white */}
+                  <td className="py-3 text-white">{usuario.email}</td>
+                  <td className="py-3">
+                    {usuario.esAdmin ? (
+                      <span className="badge border border-danger text-danger px-2 py-1 bg-transparent">
+                        ADMINISTRADOR
+                      </span>
+                    ) : (
+                      <span className="badge border border-secondary text-white px-2 py-1 bg-transparent">
+                        SOBREVIVIENTE
+                      </span>
+                    )}
+                  </td>
+                  <td className="py-3 text-end">
+                    <button 
+                      className="btn btn-outline-warning btn-sm me-2 fw-bold" 
+                      onClick={() => handleEdit(usuario)}
+                      style={{ fontSize: '0.8rem' }}
+                    >
+                      MODIFICAR
+                    </button>
+                    <button 
+                      className="btn btn-outline-danger btn-sm fw-bold" 
+                      onClick={() => handleDelete(usuario.id)}
+                      style={{ fontSize: '0.8rem' }}
+                    >
+                      EXPULSAR
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </Table>
+      </div>
 
-      <Modal show={showModal} onHide={handleClose} data-bs-theme="dark" className="text-white">
-        <Modal.Header closeButton className="bg-dark border-secondary">
-          <Modal.Title>{editMode ? 'Editar Sobreviviente' : 'Registrar Nuevo Sobreviviente'}</Modal.Title>
-        </Modal.Header>
-        <Form onSubmit={handleSubmit}>
-          <Modal.Body className="bg-dark">
-            <Form.Group className="mb-3">
-              <Form.Label>Nombre</Form.Label>
+      <Modal 
+        show={showModal} 
+        onHide={handleClose} 
+        backdrop="static"
+        contentClassName="panel-bunker p-2"
+        centered
+      >
+        <Form onSubmit={handleSubmit} style={{ fontFamily: 'sans-serif' }}>
+          <Modal.Header className="border-bottom border-danger">
+            <Modal.Title className="texto-rojo fw-bold" style={{ fontFamily: "'Shlop', cursive, sans-serif", fontSize: '2rem', letterSpacing: '1px' }}>
+              {editMode ? 'MODIFICAR ARCHIVO' : 'REGISTRAR NUEVO RECLUTA'}
+            </Modal.Title>
+            <button type="button" className="btn-close btn-close-white" onClick={handleClose} aria-label="Close"></button>
+          </Modal.Header>
+          
+          <Modal.Body className="py-4">
+            <Form.Group className="mb-4">
+              <Form.Label className="texto-verde fw-bold">Nombre del Sobreviviente *</Form.Label>
               <Form.Control 
                 type="text" 
                 name="nombre" 
                 value={formData.nombre} 
                 onChange={handleChange} 
                 required 
+                className="form-bg-bunker"
+                placeholder="Ej: Rick Grimes"
               />
             </Form.Group>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Correo Electrónico (Email)</Form.Label>
+            <Form.Group className="mb-4">
+              <Form.Label className="texto-verde fw-bold">Canal de Transmisión (Email) *</Form.Label>
               <Form.Control 
                 type="email" 
                 name="email" 
                 value={formData.email} 
                 onChange={handleChange} 
                 required 
+                className="form-bg-bunker"
+                placeholder="correo@bunker.cl"
               />
             </Form.Group>
 
-            <Form.Group className="mb-3">
-              <Form.Label>Contraseña</Form.Label>
+            <Form.Group className="mb-4">
+              <Form.Label className="texto-verde fw-bold">Clave de Acceso *</Form.Label>
               <Form.Control 
-                type="text" 
+                type="password" 
                 name="password" 
                 value={formData.password} 
                 onChange={handleChange} 
                 required={!editMode} 
-                placeholder={editMode ? "Deja en blanco para no cambiar" : ""}
+                className="form-bg-bunker"
+                placeholder={editMode ? "Dejar en blanco para mantener actual" : "Mínimo 6 caracteres"}
               />
             </Form.Group>
 
-            <Form.Group className="mb-3">
+            <Form.Group className="mt-4 p-3 border border-danger rounded" style={{ backgroundColor: '#111' }}>
               <Form.Check 
                 type="checkbox"
                 id="esAdmin"
                 name="esAdmin"
-                label="Otorgar permisos de Administrador"
                 checked={formData.esAdmin}
                 onChange={handleChange}
-                className="texto-amarillo"
+                className="text-danger fw-bold"
+                style={{ fontSize: '1rem' }}
+                label="NIVEL DE AUTORIZACIÓN: ADMINISTRADOR (Acceso total al sistema)"
               />
             </Form.Group>
           </Modal.Body>
-          <Modal.Footer className="bg-dark border-secondary">
-            <Button variant="secondary" onClick={handleClose}>Cancelar</Button>
-            <Button variant="danger" type="submit">
-              {editMode ? 'Guardar Cambios' : 'Registrar'}
-            </Button>
+
+          <Modal.Footer className="border-top border-danger">
+            <button type="button" className="btn btn-outline-secondary fw-bold" onClick={handleClose}>
+              CANCELAR
+            </button>
+            <button type="submit" className="btn btn-estilos px-4">
+              {editMode ? 'ACTUALIZAR DATOS' : 'CREAR ARCHIVO'}
+            </button>
           </Modal.Footer>
         </Form>
       </Modal>

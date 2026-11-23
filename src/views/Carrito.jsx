@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Table, Button, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Card, Table } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 export default function Carrito() {
@@ -69,37 +69,43 @@ export default function Carrito() {
   const total = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
 
   return (
-    <Container className="my-4">
-      <Alert variant="info" dismissible className="mb-4">
-        <strong>¡Hola bienvenido a carrito!</strong> En esta vista puedes administrar y determinar que deseas comprar en nuestra tienda
-      </Alert>
+    <Container className="my-5">
+      <div className="panel-bunker p-3 mb-5 text-center" style={{ borderLeft: '5px solid #dc3545' }}>
+        <p className="texto-blanco mb-0 fs-5" style={{ fontFamily: 'sans-serif' }}>
+          <strong className="texto-rojo">¡SISTEMA DE SUMINISTROS ACTIVO!</strong> Selecciona el equipamiento necesario para tu supervivencia.
+        </p>
+      </div>
 
-      <Row>
-        <Col lg={6} md={12} className="mb-4">
-          <h3 className="mb-3 text-white">Lista de productos</h3>
+      <Row className="g-4">
+        <Col lg={6} md={12}>
+          <h3 className="TituloZombie texto-rojo mb-4 text-center" style={{ fontSize: '3rem' }}>
+            ARSENAL DISPONIBLE
+          </h3>
           <Row xs={1} sm={2} md={3} className="g-3">
             {productos.map((prod) => (
               <Col key={prod.id}>
-                <Card className="h-100 text-center shadow-sm bg-dark text-white border-secondary">
+                <Card className="card-estilos h-100 text-center shadow-sm">
                   <Card.Img
                     variant="top"
                     src={prod.imagen}
-                    style={{ height: '100px', objectFit: 'contain', padding: '5px' }}
+                    className="img-estilos"
+                    style={{ height: '100px', objectFit: 'contain', padding: '10px' }}
                   />
                   <Card.Body className="d-flex flex-column justify-content-between p-2">
-                    <Card.Title style={{ fontSize: '0.85rem' }}>{prod.nombre}</Card.Title>
+                    <Card.Title className="texto-blanco" style={{ fontSize: '0.85rem', fontFamily: 'sans-serif' }}>
+                      {prod.nombre.toUpperCase()}
+                    </Card.Title>
                     <div>
-                      <div className="fw-bold text-danger mb-2">
+                      <div className="texto-rojo fw-bold mb-2">
                         ${prod.precio.toLocaleString()}
                       </div>
-                      <Button
-                        variant="outline-light"
-                        size="sm"
-                        className="w-100"
+                      <button
+                        className="btn btn-estilos w-100"
+                        style={{ fontSize: '0.8rem', padding: '5px' }}
                         onClick={() => agregarAlCarrito(prod)}
                       >
-                        Añadir
-                      </Button>
+                        AÑADIR
+                      </button>
                     </div>
                   </Card.Body>
                 </Card>
@@ -109,71 +115,71 @@ export default function Carrito() {
         </Col>
 
         <Col lg={6} md={12}>
-          <h3 className="mb-3 text-white">Carrito de Compras</h3>
-          <Card className="shadow-sm p-3 bg-dark text-white border-secondary">
-            <Table responsive borderless align="middle" variant="dark" className="mb-3">
+          <h3 className="TituloZombie texto-verde mb-4 text-center" style={{ fontSize: '3rem' }}>
+            TU MOCHILA
+          </h3>
+          <div className="panel-bunker p-4 shadow-sm">
+            <Table responsive borderless align="middle" className="texto-blanco mb-3" style={{ fontFamily: 'sans-serif' }}>
               <thead>
-                <tr className="border-bottom border-secondary">
-                  <th>Imagen</th>
+                <tr className="border-bottom border-danger">
+                  <th>Img</th>
                   <th>Nombre</th>
                   <th>Precio</th>
-                  <th>Cantidad</th>
+                  <th className="text-center">Cant.</th>
                   <th>Subtotal</th>
-                  <th>Acción</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
                 {carrito.length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="text-center py-4">
-                      El carrito está vacío, haz clic en "Añadir" en algún producto
+                    <td colSpan="6" className="text-center py-5 texto-amarillo">
+                      Tu mochila está vacía. Añade suministros antes de salir.
                     </td>
                   </tr>
                 ) : (
                   carrito.map((item) => (
-                    <tr key={item.id} className="border-bottom border-secondary">
+                    <tr key={item.id} className="border-bottom" style={{ borderColor: '#333' }}>
                       <td>
                         <img
                           src={item.imagen}
                           alt={item.nombre}
-                          style={{ width: '35px', height: '35px', objectFit: 'contain' }}
+                          style={{ width: '40px', height: '40px', objectFit: 'contain', backgroundColor: '#0d0d0d', borderRadius: '4px' }}
                         />
                       </td>
-                      <td style={{ fontSize: '0.8rem' }}>{item.nombre}</td>
-                      <td style={{ fontSize: '0.8rem' }}>${item.precio.toLocaleString()}</td>
+                      <td style={{ fontSize: '0.85rem' }}>{item.nombre.toUpperCase()}</td>
+                      <td style={{ fontSize: '0.85rem' }}>${item.precio.toLocaleString()}</td>
                       <td>
-                        <div className="d-flex align-items-center gap-1">
-                          <Button
-                            variant="outline-danger"
-                            size="sm"
-                            style={{ padding: '0px 5px', fontSize: '0.7rem' }}
+                        <div className="d-flex align-items-center justify-content-center gap-2">
+                          <button
+                            className="btn btn-outline-danger btn-sm"
+                            style={{ padding: '0px 8px', fontWeight: 'bold' }}
                             onClick={() => cambiarCantidad(item.id, -1)}
                           >
                             -
-                          </Button>
-                          <span style={{ fontSize: '0.8rem' }}>{item.cantidad}</span>
-                          <Button
-                            variant="outline-success"
-                            size="sm"
-                            style={{ padding: '0px 5px', fontSize: '0.7rem' }}
+                          </button>
+                          <span style={{ fontSize: '0.9rem', width: '20px', textAlign: 'center' }}>{item.cantidad}</span>
+                          <button
+                            className="btn btn-outline-success btn-sm"
+                            style={{ padding: '0px 8px', fontWeight: 'bold' }}
                             onClick={() => cambiarCantidad(item.id, 1)}
                           >
                             +
-                          </Button>
+                          </button>
                         </div>
                       </td>
-                      <td style={{ fontSize: '0.8rem' }}>
+                      <td className="texto-rojo fw-bold" style={{ fontSize: '0.85rem' }}>
                         ${(item.precio * item.cantidad).toLocaleString()}
                       </td>
-                      <td>
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          style={{ fontSize: '0.7rem' }}
+                      <td className="text-end">
+                        <button
+                          className="btn btn-danger btn-sm"
+                          style={{ fontSize: '0.7rem', padding: '4px 8px' }}
                           onClick={() => eliminarProducto(item.id)}
+                          title="Descartar"
                         >
-                          Eliminar
-                        </Button>
+                          X
+                        </button>
                       </td>
                     </tr>
                   ))
@@ -181,23 +187,27 @@ export default function Carrito() {
               </tbody>
             </Table>
 
-            <div className="d-flex flex-column align-items-end gap-2 mt-2">
-              <div className="fs-5 fw-bold">
-                Total: <span className="text-danger">${total.toLocaleString()}</span>
+            <div className="d-flex flex-column align-items-end gap-3 mt-4 border-top border-danger pt-3">
+              <div className="texto-blanco" style={{ fontSize: '1.5rem', fontFamily: 'sans-serif' }}>
+                TOTAL: <span className="texto-rojo fw-bold">${total.toLocaleString()}</span>
               </div>
-              <div className="d-flex gap-2">
-                <Button variant="secondary" size="sm" onClick={limpiarCarrito}>
-                  Limpiar
-                </Button>
-                <Button
-                variant="success" 
-                size="sm"
-                onClick={() => navigate('/checkout')}>
-                Comprar ahora          
-                </Button>
+              <div className="d-flex gap-3 w-100 justify-content-end">
+                <button 
+                  className="btn btn-outline-secondary text-white px-3" 
+                  onClick={limpiarCarrito}
+                >
+                  VACIAR MOCHILA
+                </button>
+                <button
+                  className="btn btn-estilos px-4"
+                  onClick={() => navigate('/checkout')}
+                  disabled={carrito.length === 0}
+                >
+                  PROCESAR COMPRA
+                </button>
               </div>
             </div>
-          </Card>
+          </div>
         </Col>
       </Row>
     </Container>

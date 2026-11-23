@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
-import { Container, Card, Form, Button, Alert } from 'react-bootstrap';
+import { Container, Form, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useGoogleLogin } from '@react-oauth/google';
 
 export function Registro({ setUsuario }) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    nombre: '',
-    apellidos: '',
-    email: '', 
-    password: '',
+    nombre: '', apellidos: '', email: '', password: '',
   });
   const [mensaje, setMensaje] = useState('');
   const [tipoAlerta, setTipoAlerta] = useState('info');
@@ -18,12 +15,9 @@ export function Registro({ setUsuario }) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // 1. Registro manual conectado a Spring Boot
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     try {
-      // Verificamos si el correo ya existe en la Base de Datos
       const resGet = await fetch('http://localhost:8080/api/usuario');
       const usuariosRegistrados = await resGet.json();
       const existe = usuariosRegistrados.find(u => u.email === formData.email);
@@ -34,27 +28,19 @@ export function Registro({ setUsuario }) {
         return;
       }
 
-      // Preparamos el usuario uniendo nombre y apellido para el backend
       const nuevoUsuario = { 
         nombre: `${formData.nombre} ${formData.apellidos}`.trim(),
-        email: formData.email,
-        password: formData.password,
-        esAdmin: false 
+        email: formData.email, password: formData.password, esAdmin: false 
       };
 
-      // Guardamos en la base de datos (POST)
       const response = await fetch('http://localhost:8080/api/usuario', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(nuevoUsuario)
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(nuevoUsuario)
       });
 
       if (response.ok) {
         setTipoAlerta('success');
         setMensaje('¡Registro exitoso! Redirigiendo al inicio de sesión...');
-        setTimeout(() => {
-          navigate('/iniciar-sesion');
-        }, 1500);
+        setTimeout(() => { navigate('/iniciar-sesion'); }, 1500);
       } else {
         setTipoAlerta('danger');
         setMensaje('Error al registrar el usuario en el servidor.');
@@ -66,7 +52,6 @@ export function Registro({ setUsuario }) {
     }
   };
 
-  // 2. Registro con Google conectado a Spring Boot
   const registroConGoogle = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
@@ -75,30 +60,21 @@ export function Registro({ setUsuario }) {
         });
         const userInfo = await resGoogle.json();
 
-        // Consultamos la BD
         const resDb = await fetch('http://localhost:8080/api/usuario');
         const usuariosGuardados = await resDb.json();
         let usuarioExistente = usuariosGuardados.find(u => u.email === userInfo.email);
 
-        // Si no existe, lo creamos en la BD
         if (!usuarioExistente) {
           const nuevoUsuario = {
             nombre: `${userInfo.given_name || userInfo.name} ${userInfo.family_name || ''}`.trim(),
-            email: userInfo.email,
-            password: '',
-            esAdmin: false,
-            avatar: userInfo.picture
+            email: userInfo.email, password: '', esAdmin: false, avatar: userInfo.picture
           };
-
           const createRes = await fetch('http://localhost:8080/api/usuario', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(nuevoUsuario)
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(nuevoUsuario)
           });
           usuarioExistente = await createRes.json();
         }
 
-        // Activamos la sesión en el frontend
         localStorage.setItem('usuario_activo', JSON.stringify(usuarioExistente));
         if (setUsuario) setUsuario(usuarioExistente);
         navigate('/inicio');
@@ -114,13 +90,23 @@ export function Registro({ setUsuario }) {
 
   return (
     <Container className="my-5" style={{ maxWidth: '500px' }}>
-      <Card className="shadow-lg p-4 bg-dark text-white border-secondary">
-        <h2 className="mb-4 text-center">Crear Cuenta</h2>
-        {mensaje && <Alert variant={tipoAlerta}>{mensaje}</Alert>}
+      <div className="panel-bunker p-5">
+        <h2 className="mb-4 text-center TituloZombie texto-rojo" style={{ fontSize: '2.5rem' }}>
+          CREAR CUENTA
+        </h2>
+        
+        {mensaje && (
+          <Alert 
+            variant={tipoAlerta} 
+            className={tipoAlerta === 'danger' ? 'bg-dark text-danger border-danger' : 'bg-dark text-success border-success'}
+          >
+            {mensaje}
+          </Alert>
+        )}
         
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
-            <Form.Label>Nombre</Form.Label>
+            <Form.Label className="texto-blanco form-label">Nombre</Form.Label>
             <Form.Control
               type="text"
               name="nombre"
@@ -128,11 +114,12 @@ export function Registro({ setUsuario }) {
               value={formData.nombre}
               onChange={handleChange}
               required
+              className="form-bg-bunker"
             />
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Apellidos</Form.Label>
+            <Form.Label className="texto-blanco form-label">Apellidos</Form.Label>
             <Form.Control
               type="text"
               name="apellidos"
@@ -140,23 +127,25 @@ export function Registro({ setUsuario }) {
               value={formData.apellidos}
               onChange={handleChange}
               required
+              className="form-bg-bunker"
             />
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Correo Electrónico</Form.Label>
+            <Form.Label className="texto-blanco form-label">Correo Electrónico</Form.Label>
             <Form.Control
               type="email"
               name="email"
-              placeholder="ejemplo@correo.com"
+              placeholder="admin@elbunker.cl"
               value={formData.email}
               onChange={handleChange}
               required
+              className="form-bg-bunker"
             />
           </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Contraseña</Form.Label>
+          <Form.Group className="mb-4">
+            <Form.Label className="texto-blanco form-label">Contraseña</Form.Label>
             <Form.Control
               type="password"
               name="password"
@@ -164,25 +153,27 @@ export function Registro({ setUsuario }) {
               value={formData.password}
               onChange={handleChange}
               required
+              className="form-bg-bunker"
             />
           </Form.Group>
 
-          <Button variant="success" type="submit" className="w-100 fw-bold">
-            Registrarse
-          </Button>
+          <button type="submit" className="btn btn-estilos w-100 p-2 mb-3 fs-5">
+            REGISTRARSE
+          </button>
         </Form>
-        <div className="my-3 text-center">
-        <span className="text-secondary small">O REGÍSTRATE DIRECTAMENTE</span>
-      </div>
 
-      <button
-        type="button"
-        onClick={() => registroConGoogle()}
-        className="btn btn-outline-light w-100 d-flex align-items-center justify-content-center gap-2"
-      >
-        Registrarse con Google
-      </button>
-      </Card>
+        <div className="my-3 text-center">
+          <span className="text-muted small">O REGÍSTRATE DIRECTAMENTE</span>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => registroConGoogle()}
+          className="btn btn-outline-secondary text-white w-100 p-2 d-flex align-items-center justify-content-center gap-2"
+        >
+          Registrarse con Google
+        </button>
+      </div>
     </Container>
   );
 }

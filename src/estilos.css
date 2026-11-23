@@ -1,157 +1,198 @@
+/* =========================================
+   1. VARIABLES Y FUENTES
+   ========================================= */
+:root {
+  --bg-dark: #121212;
+  --bg-panel: #1a1a1a;
+  --text-main: #ffffff;
+  --text-muted: #888888;
+  
+  --accent-red: #dc3545;
+  --accent-red-hover: #ff4d4d;
+  --accent-yellow: #ffc107;
+  --accent-green: #155f13;
+  --accent-green-border: #114b18;
+
+  --font-bunker: 'Shlop', cursive, sans-serif;
+  --font-base: sans-serif;
+}
+
 @font-face {
   font-family: 'Shlop';
   src: url('./font/shlop rg.otf') format('opentype');
 }
 
+/* =========================================
+   2. ESTILOS BASE Y TIPOGRAFÍA
+   ========================================= */
+body {
+  font-family: var(--font-bunker);
+  background-color: var(--bg-dark); 
+  color: var(--text-main);
+}
+
+p, button, .modal-body {
+  font-family: var(--font-base);
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+}
+
 .fuente-bunker {
-  font-family: 'Shlop', sans-serif !important;
+  font-family: var(--font-bunker) !important;
   letter-spacing: 2px; 
 }
 
-
-body {
-  font-family: 'Shlop', cursive, sans-serif; /* Corregido para que coincida */
-  background-color: #121212; 
+.TituloBunker {
+  font-family: var(--font-bunker) !important;
+  font-size: 4.5rem;
+  letter-spacing: 3px; 
 }
 
-
-p, button, .modal-body {
-    font-size: 3rem;
-    letter-spacing: 2px;
+.TituloZombie {
+  font-family: var(--font-bunker) !important;
+  font-size: 4rem;
+  letter-spacing: 3px; 
 }
 
-.TituloBunker{
-    font-size: 10rem;
-    letter-spacing: 3px; 
-}
+/* Colores de Texto */
+.texto-blanco { color: var(--text-main) !important; }
+.texto-rojo { color: var(--accent-red) !important; }
+.texto-verde { color: var(--accent-green) !important; }
+.texto-amarillo { color: var(--accent-yellow) !important; }
 
-.TituloZombie{
-    font-size: 6rem;
-    letter-spacing: 3px; 
-}
-
-.texto-blanco {
-    color: #ffffff !important;
-}
-
-.texto-rojo {
-    color: #dc3545 !important; 
-}
-
-.texto-verde {
-    color: #155f13 !important; 
-}
-
-.texto-amarillo {
-    color: #ffc107 !important; 
-}
-
+/* =========================================
+   3. NAVEGACIÓN (NAVBAR)
+   ========================================= */
 .navbar-bunker {
-    background-color: #121212 !important;
-    border-bottom: 2px solid #dc3545 !important;
-    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+  background-color: var(--bg-dark) !important;
+  border-bottom: 2px solid var(--accent-red) !important;
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
 }
-
 
 .nav-link-bunker {
-    color: #ffffff !important;
-    font-size: 1.2rem;
-    letter-spacing: 1px;
-    transition: all 0.3s ease;
-    padding: 8px 15px !important;
+  color: var(--text-main) !important;
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  padding: 8px 15px !important;
 }
 
-
 .nav-link-bunker:hover {
-    color: #dc3545 !important; 
-    text-shadow: 0 0 8px rgba(220, 53, 69, 0.8);
+  color: var(--accent-red) !important; 
+  text-shadow: 0 0 8px rgba(220, 53, 69, 0.8);
 }
 
 .nav-link-bunker.active {
-    color: #ffc107 !important; 
-    font-weight: bold;
-    border-bottom: 2px solid #ffc107;
+  color: var(--accent-yellow) !important; 
+  font-weight: bold;
+  border-bottom: 2px solid var(--accent-yellow);
 }
 
-
-
-
-
+/* =========================================
+   4. FORMULARIOS E INPUTS
+   ========================================= */
 .form-bg-bunker {
-    background-color: #1a1a1a !important;
-    color: #ffffff !important;
-    font-family: sans-serif;
-    font-size: 1rem !important;
+  background-color: var(--bg-panel) !important;
+  color: var(--text-main) !important;
+  font-family: var(--font-base);
+  font-size: 1rem !important;
 }
 
 .form-bg-bunker::placeholder {
-    color: #888888 !important;
+  color: var(--text-muted) !important;
 }
 
 .form-bg-bunker:focus {
-    border-color: #ffc107 !important;
-    box-shadow: 0 0 8px rgba(255, 193, 7, 0.5) !important;
+  border-color: var(--accent-yellow) !important;
+  box-shadow: 0 0 8px rgba(255, 193, 7, 0.5) !important;
 }
 
 .form-label {
-    font-size: 1.5rem !important;
-    letter-spacing: 1px;
+  font-family: var(--font-base);
+  font-size: 1.1rem !important;
+  letter-spacing: 1px;
 }
 
-
-
-
+/* =========================================
+   5. TARJETAS, PANELES Y MODALES
+   ========================================= */
+.panel-bunker, .modal-estilos {
+  background-color: var(--bg-panel);
+  border: 2px solid var(--accent-red);
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(220, 53, 69, 0.4);
+  font-family: var(--font-base); 
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+}
 
 .card-estilos {
-    background-color: #1a1a1a;
-    border: 2px solid #a83232;
-    border-radius: 8px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.card-estilosZ {
-    background-color: #1a1a1a;
-    border: 5px solid #114b18;
-    border-radius: 8px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
-    overflow: hidden;
-    height: 400px;
-    width: 100%;
-    max-width: 1000px;
-}
-
-.card-estilosZ .img-estilos {
-  height: 100%;
-  object-fit: cover;
+  background-color: var(--bg-panel);
+  border: 2px solid #a83232;
+  border-radius: 8px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card-estilos:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 8px 20px rgba(168, 50, 50, 0.4);
+  transform: translateY(-6px);
+  box-shadow: 0 8px 20px rgba(168, 50, 50, 0.4);
+}
+
+.card-estilosZ {
+  background-color: var(--bg-panel);
+  border: 5px solid var(--accent-green-border);
+  border-radius: 8px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  overflow: hidden;
+  height: 400px;
+  width: 100%;
+  max-width: 1000px;
 }
 
 .img-estilos {
-    background-color: #0d0d0d;
-    border-bottom: 1px solid #333;
-    padding: 10px;
+  background-color: #0d0d0d;
+  border-bottom: 1px solid #333;
+  padding: 10px;
 }
 
+/* =========================================
+   6. BOTONES TÁCTICOS
+   ========================================= */
 .btn-estilos {
-    background-color: transparent;
-    color: #ff4d4d;
-    border: 1px solid #ff4d4d;
-    font-weight: bold;
-    transition: all 0.2s ease;
+  background-color: transparent;
+  color: var(--accent-red-hover);
+  border: 1px solid var(--accent-red-hover);
+  font-weight: bold;
+  transition: all 0.2s ease;
 }
 
 .btn-estilos:hover {
-    background-color: #ff4d4d;
-    color: #000;
+  background-color: var(--accent-red-hover);
+  color: #000000;
 }
 
-.modal-estilos {
-    background-color: #1a1a1a;
-    border: 2px solid #dc3545;
-    box-shadow: 0 0 20px rgba(220, 53, 69, 0.4);
-    border-radius: 10px;
+.btn-categoria {
+  background-color: var(--bg-panel) !important;
+  color: var(--text-main) !important;
+  border: 2px solid var(--accent-red) !important;
+  border-radius: 8px;
+  padding: 10px 25px !important;
+  font-family: var(--font-base);
+  font-weight: bold;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-categoria:hover {
+  background-color: rgba(220, 53, 69, 0.2) !important;
+  box-shadow: 0 0 10px rgba(220, 53, 69, 0.3);
+}
+
+.btn-categoria.active {
+  background-color: var(--accent-red) !important;
+  color: var(--text-main) !important;
+  box-shadow: 0 0 15px rgba(220, 53, 69, 0.6);
+  transform: scale(1.05);
 }

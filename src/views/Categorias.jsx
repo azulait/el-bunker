@@ -1,18 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { ProductoCard } from '../components/ProductoCard';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Nav from 'react-bootstrap/Nav';
+import { Container, Row, Col, Nav } from 'react-bootstrap';
 
 export function Categorias() {
   const [categoriaActiva, setCategoriaActiva] = useState('Todas');
   const [listaProductos, setListaProductos] = useState([]);
 
-  // Categorías disponibles
-  const categorias = ['Todas', 'Armas', 'Kits']; // Ajustado para que coincida con las categorías del Admin
+  const categorias = ['Todas', 'Armas', 'Kits'];
 
-  // Reemplazamos la lectura de localStorage/productos.js por la petición fetch a tu API
   useEffect(() => {
     const fetchProductos = async () => {
       try {
@@ -32,9 +27,12 @@ export function Categorias() {
     : listaProductos.filter(prod => prod.categoria === categoriaActiva);
 
   return (
-    <Container className="mt-5 text-white fuente-bunker">
-      <h1 className="text-center mb-4 text-danger display-4">Suministros del Bunker</h1>
-      <p className="text-center mb-4 fs-5 text-light">
+    <Container className="mt-5 text-center">
+      <h1 className="TituloBunker texto-rojo mb-4" style={{ fontSize: '4rem' }}>
+        SUMINISTROS DEL BUNKER
+      </h1>
+      
+      <p className="texto-blanco mb-5" style={{ fontSize: '1.2rem', fontFamily: 'sans-serif' }}>
         Selecciona una categoría para filtrar el equipamiento de supervivencia disponible.
       </p>
 
@@ -42,23 +40,20 @@ export function Categorias() {
         variant="pills" 
         activeKey={categoriaActiva} 
         onSelect={(selectedKey) => setCategoriaActiva(selectedKey)}
-        className="justify-content-center mb-5 gap-2"
+        className="justify-content-center mb-5 gap-3"
       >
         {categorias.map((cat) => (
           <Nav.Item key={cat}>
             <Nav.Link 
               eventKey={cat} 
-              className={`fw-bold px-4 py-2 border border-danger ${
-                categoriaActiva === cat ? 'bg-danger text-white' : 'bg-dark text-danger'
-              }`}
+              className={`btn-categoria ${categoriaActiva === cat ? 'active' : ''}`}
             >
-              {cat === 'Armas' ? 'Armas y Defensa' : cat === 'Kits' ? 'Kits' : 'Todas'}
+              {cat === 'Armas' ? 'ARMAS Y DEFENSA' : cat === 'Kits' ? 'KITS' : 'TODAS'}
             </Nav.Link>
           </Nav.Item>
         ))}
       </Nav>
 
-      {/* Grilla de Productos Filtrados */}
       <Row xs={1} md={2} lg={3} className="g-4">
         {productosFiltrados.length > 0 ? (
           productosFiltrados.map((prod) => (
@@ -68,7 +63,9 @@ export function Categorias() {
           ))
         ) : (
           <Col xs={12} className="text-center py-5">
-            <h3 className="text-warning">No hay suministros registrados en esta categoría.</h3>
+            <h3 className="TituloZombie texto-amarillo" style={{ fontSize: '3rem' }}>
+              NO HAY SUMINISTROS REGISTRADOS EN ESTA CATEGORÍA.
+            </h3>
           </Col>
         )}
       </Row>
